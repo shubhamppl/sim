@@ -1,0 +1,186 @@
+.tariff-simulator {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background-color: white;
+}
+
+.header {
+    background-color: #f0f0f0;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.musigma-logo {
+    height: 40px;
+    width: auto;
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.user-icon {
+    height: 30px;
+    width: auto;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.user-icon:hover {
+    transform: scale(1.1);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-width: 150px;
+}
+
+.dropdown-menu button {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.dropdown-menu button:hover {
+    background-color: #f5f5f5;
+}
+
+.upload-btn {
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.upload-btn:hover {
+    background-color: #2980b9;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 25px 40px;
+    margin-top: 30px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+.search-item {
+    flex: 1;
+    max-width: calc(25% - 12px); /* Ensures equal width with gap consideration */
+    min-width: 180px; /* Minimum width to prevent squishing */
+    position: relative;
+}
+
+.search-select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #495057;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1em;
+}
+
+.search-select:hover {
+    border-color: #adb5bd;
+}
+
+.search-select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+}
+
+.search-select option {
+    padding: 10px;
+}
+
+.search-input {
+    width: 100%;
+    box-sizing: border-box; /* Ensures padding doesn't add to width */
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #495057;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+.search-input:hover {
+    border-color: #adb5bd;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Style for datalist options when shown */
+datalist {
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+option {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    background: white;
+    transition: background-color 0.2s;
+}
+
+option:hover {
+    background-color: #f8f9fa;
+}
+
+.filter-info {
+    margin: 20px 40px 10px 40px;
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    padding-left: 5px;
+}
+
