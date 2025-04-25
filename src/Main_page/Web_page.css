@@ -184,3 +184,159 @@ option:hover {
     padding-left: 5px;
 }
 
+/* New styles for submit button and ingredients */
+.submit-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.submit-btn {
+    padding: 12px 30px;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.submit-btn:hover {
+    background-color: #219653;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ingredients-container {
+    margin: 20px 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.ingredients-container h2 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.ingredients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ingredient-item {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+}
+
+.ingredient-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.ingredient-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    transition: background-color 0.2s;
+}
+
+.ingredient-header:hover {
+    background-color: #eaeaea;
+}
+
+.ingredient-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.expand-icon {
+    font-size: 12px;
+    color: #666;
+    transition: transform 0.2s;
+}
+
+.expand-icon.expanded {
+    transform: rotate(0deg);
+}
+
+.ingredient-details {
+    padding: 15px 20px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+}
+
+/* Show Results Button Styles */
+.show-results-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.show-results-btn {
+    padding: 14px 40px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    letter-spacing: 0.5px;
+}
+
+.show-results-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.show-results-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.config-text {
+    color: #666;
+    margin: 10px 0;
+    font-style: italic;
+}
+
+.ingredient-filters {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.ingredient-input {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 120px;
+}

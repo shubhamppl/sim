@@ -11,6 +11,19 @@ const WebPage = () => {
   const [selectedType, setSelectedType] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedProduct, setSelectedProduct] = useState('');
+  
+  // New state for form submission and ingredients
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [expandedIngredient, setExpandedIngredient] = useState(null);
+
+  // Sample ingredients data (this would come from your API in a real app)
+  const ingredients = [
+    { id: 1, name: 'Cocoa Butter', details: 'Origin: Ghana, Price: $12.50/kg, Quality: Premium' },
+    { id: 2, name: 'Sugar', details: 'Origin: Brazil, Price: $2.30/kg, Quality: Refined' },
+    { id: 3, name: 'Milk Powder', details: 'Origin: New Zealand, Price: $8.75/kg, Quality: Full Cream' },
+    { id: 4, name: 'Vanilla Extract', details: 'Origin: Madagascar, Price: $45.20/L, Quality: Pure' },
+    { id: 5, name: 'Lecithin', details: 'Origin: USA, Price: $15.60/kg, Quality: Soy-based' }
+  ];
 
   const handleSignOut = () => {
     try {
@@ -32,6 +45,23 @@ const WebPage = () => {
 
   const handleDocumentation = () => {
     alert('Documentation coming soon!');
+  };
+
+  const handleSubmit = () => {
+    // Validate inputs if needed
+    if (selectedCountry && selectedType && selectedCategory && selectedProduct) {
+      setIsSubmitted(true);
+    } else {
+      alert('Please fill in all fields before submitting');
+    }
+  };
+
+  const toggleIngredient = (id) => {
+    if (expandedIngredient === id) {
+      setExpandedIngredient(null);
+    } else {
+      setExpandedIngredient(id);
+    }
   };
 
   return (
@@ -91,21 +121,6 @@ const WebPage = () => {
         <div className="search-item">
           <input 
             type="text"
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-            className="search-input"
-            placeholder="Enter/Select Type"
-            list="types"
-          />
-          <datalist id="types">
-            <option value="Import" />
-            <option value="Export" />
-          </datalist>
-        </div>
-
-        <div className="search-item">
-          <input 
-            type="text"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="search-input"
@@ -135,8 +150,75 @@ const WebPage = () => {
             <option value="50% dark chocolate" />
           </datalist>
         </div>
+
+        <div className="search-item">
+          <input 
+            type="number"
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+            className="search-input"
+            placeholder="Enter units"
+            min="0"
+            step="1"
+          />
+        </div>
       </div>
       
+      <div className="submit-container">
+        <button className="submit-btn" onClick={handleSubmit}>
+          Submit
+        </button>
+      </div>
+
+      {isSubmitted && (
+        <div className="ingredients-container">
+          <h2>Ingredients for {selectedProduct}</h2>
+          <p className="config-text">Configure the ingredients quantities and specifications:</p>
+          <div className="ingredients-list">
+            {ingredients.map(ingredient => (
+              <div key={ingredient.id} className="ingredient-item">
+                <div 
+                  className="ingredient-header" 
+                  onClick={() => toggleIngredient(ingredient.id)}
+                >
+                  <h3>{ingredient.name}</h3>
+                  <span className={`expand-icon ${expandedIngredient === ingredient.id ? 'expanded' : ''}`}>
+                    {expandedIngredient === ingredient.id ? '▼' : '▶'}
+                  </span>
+                </div>
+                {expandedIngredient === ingredient.id && (
+                  <div className="ingredient-details">
+                    {ingredient.details}
+                    <div className="ingredient-filters">
+                      <input 
+                        type="number" 
+                        placeholder="Quantity (kg)"
+                        min="0"
+                        step="0.1"
+                        className="ingredient-input"
+                      />
+                      <select className="ingredient-input">
+                        <option value="">Select Quality</option>
+                        <option value="premium">Premium</option>
+                        <option value="standard">Standard</option>
+                        <option value="basic">Basic</option>
+                      </select>
+                      <select className="ingredient-input">
+                        <option value="">Select Origin</option>
+                        <option value="domestic">Domestic</option>
+                        <option value="imported">Imported</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="show-results-container">
+            <button className="show-results-btn">Show Results</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
