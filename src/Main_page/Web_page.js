@@ -15,14 +15,15 @@ const WebPage = () => {
   // New state for form submission and ingredients
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [expandedIngredient, setExpandedIngredient] = useState(null);
+  const [totalQuantity, setTotalQuantity] = useState(100); // Default 100g total
 
-  // Sample ingredients data (this would come from your API in a real app)
+  // Updated ingredients data with percentages
   const ingredients = [
-    { id: 1, name: 'Cocoa Butter', details: 'Origin: Ghana, Price: $12.50/kg, Quality: Premium' },
-    { id: 2, name: 'Sugar', details: 'Origin: Brazil, Price: $2.30/kg, Quality: Refined' },
-    { id: 3, name: 'Milk Powder', details: 'Origin: New Zealand, Price: $8.75/kg, Quality: Full Cream' },
-    { id: 4, name: 'Vanilla Extract', details: 'Origin: Madagascar, Price: $45.20/L, Quality: Pure' },
-    { id: 5, name: 'Lecithin', details: 'Origin: USA, Price: $15.60/kg, Quality: Soy-based' }
+    { id: 1, name: 'Cocoa Butter', percentage: 32.79, details: 'Origin: Ghana, Price: $12.50/kg, Quality: Premium' },
+    { id: 2, name: 'Sugar', percentage: 38.26, details: 'Origin: Brazil, Price: $2.30/kg, Quality: Refined' },
+    { id: 3, name: 'Milk Powder', percentage: 27.37, details: 'Origin: New Zealand, Price: $8.75/kg, Quality: Full Cream' },
+    { id: 4, name: 'Vanilla Extract', percentage: 1.09, details: 'Origin: Madagascar, Price: $45.20/L, Quality: Pure' },
+    { id: 5, name: 'Lecithin', percentage: 0.49, details: 'Origin: USA, Price: $15.60/kg, Quality: Soy-based' }
   ];
 
   const handleSignOut = () => {
@@ -62,6 +63,11 @@ const WebPage = () => {
     } else {
       setExpandedIngredient(id);
     }
+  };
+
+  const calculateIngredientWeight = (percentage) => {
+    const baseWeight = (percentage * totalQuantity / 100);
+    return (baseWeight * (selectedType || 1)).toFixed(2);
   };
 
   return (
@@ -181,10 +187,14 @@ const WebPage = () => {
                   className="ingredient-header" 
                   onClick={() => toggleIngredient(ingredient.id)}
                 >
-                  <h3>{ingredient.name}</h3>
-                  <span className={`expand-icon ${expandedIngredient === ingredient.id ? 'expanded' : ''}`}>
+                  <div className="ingredient-info">
+                    <div className="ingredient-name">{ingredient.name}</div>
+                    <div className="ingredient-percentage">{ingredient.percentage}%</div>
+                    <div className="ingredient-weight">{calculateIngredientWeight(ingredient.percentage)}g</div>
+                  </div>
+                  <div className="expand-icon">
                     {expandedIngredient === ingredient.id ? '▼' : '▶'}
-                  </span>
+                  </div>
                 </div>
                 {expandedIngredient === ingredient.id && (
                   <div className="ingredient-details">
@@ -192,9 +202,8 @@ const WebPage = () => {
                     <div className="ingredient-filters">
                       <input 
                         type="number" 
-                        placeholder="Quantity (kg)"
-                        min="0"
-                        step="0.1"
+                        value={calculateIngredientWeight(ingredient.percentage)}
+                        readOnly
                         className="ingredient-input"
                       />
                       <select className="ingredient-input">
