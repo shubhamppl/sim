@@ -260,27 +260,35 @@ option:hover {
 }
 
 .ingredient-info {
-    display: grid;
-    grid-template-columns: 200px 100px 120px;
-    gap: 20px;
+    display: flex;
     align-items: center;
+    gap: 30px;
     width: 100%;
 }
 
 .ingredient-name {
+    width: 180px;
     font-weight: 500;
     color: #2c3e50;
 }
 
-.ingredient-percentage {
+.ingredient-percentage, .ingredient-weight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: #7f8c8d;
-    text-align: right;
 }
 
-.ingredient-weight {
-    color: #3498db;
-    text-align: right;
-    font-weight: 500;
+.ingredient-percentage::before {
+    content: 'Percentage (%):';
+    color: #95a5a6;
+    font-weight: normal;
+}
+
+.ingredient-weight::before {
+    content: 'Weight:';
+    color: #95a5a6;
+    font-weight: normal;
 }
 
 .expand-icon {
