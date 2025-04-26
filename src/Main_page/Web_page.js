@@ -189,8 +189,8 @@ const WebPage = () => {
                 >
                   <div className="ingredient-info">
                     <div className="ingredient-name">{ingredient.name}</div>
-                    <div className="ingredient-percentage">{ingredient.percentage}%</div>
-                    <div className="ingredient-weight">{calculateIngredientWeight(ingredient.percentage)}g</div>
+                    <div className="ingredient-percentage">percent: {ingredient.percentage}%</div>
+                    <div className="ingredient-weight">weight: {calculateIngredientWeight(ingredient.percentage)}g</div>
                   </div>
                   <div className="expand-icon">
                     {expandedIngredient === ingredient.id ? '▼' : '▶'}
