@@ -16,6 +16,10 @@ const Login = () => {
         }, 1500);
     };
 
+    const handleUploadClick = () => {
+        navigate('/upload');
+    };
+
     return (
         <div className="login-container">
             <div className="header">
@@ -41,12 +45,9 @@ const Login = () => {
                         <button 
                             type="button"
                             className="info-button" 
-                            onClick={(e) => {
-                                e.preventDefault();
-                                console.log('Info clicked');
-                            }}
+                            onClick={handleUploadClick}
                         >
-                            Info
+                            Upload Data
                         </button>
                     </div>
                 </form>

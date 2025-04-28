@@ -206,6 +206,44 @@ const WebPage = () => {
   // Add tariff constant
   const TARIFF_PERCENTAGE = 5;
 
+  // Add new state variables for preview functionality
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewData, setPreviewData] = useState({ headers: [], rows: [] });
+
+  // Add function to handle preview click
+  const handlePreviewClick = async () => {
+    try {
+      const db = await new Promise((resolve, reject) => {
+        const request = indexedDB.open("TariffDB", 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+
+      const transaction = db.transaction("files", "readonly");
+      const store = transaction.objectStore("files");
+      const files = await new Promise((resolve, reject) => {
+        const request = store.getAll();
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+
+      if (files.length > 0) {
+        // Get the most recent file
+        const latestFile = files[files.length - 1];
+        setPreviewData({
+          headers: latestFile.headers,
+          rows: latestFile.rows
+        });
+        setShowPreview(true);
+      } else {
+        alert('No uploaded files found');
+      }
+    } catch (error) {
+      console.error('Error loading preview:', error);
+      alert('Error loading preview data');
+    }
+  };
+
   return (
     <div className="tariff-simulator">
       <div className="header">
@@ -225,23 +263,59 @@ const WebPage = () => {
           >
             Upload
           </button>
-          <img
-            src="/images/user.png"
-            alt="User"
-            className="user-icon"
-            onClick={handleUserClick}
-          />
-          {showDropdown && (
-            <div className="dropdown-menu">
-              <button onClick={handleSignOut}>Sign Out</button>
-            </div>
-          )}
+          <button
+            className="upload-btn"
+            onClick={handleSignOut}
+            style={{ transform: 'translateY(-1px)' }}
+          >
+            Return to Home
+          </button>
         </div>
       </div>
 
       <div className="filter-info">
-        Configure your tariff analysis parameters:
+        <div className="filter-header">
+          <span>Configure your tariff analysis parameters:</span>
+          <button className="preview-btn" onClick={handlePreviewClick}>
+            Preview Data
+          </button>
+        </div>
+        {showPreview && (
+          <div className="preview-overlay">
+            <div className="preview-modal">
+              <div className="preview-header">
+                <h3>Uploaded Data Preview</h3>
+                <button className="close-btn" onClick={() => setShowPreview(false)}>×</button>
+              </div>
+              <div className="preview-content">
+                {previewData.headers.length > 0 ? (
+                  <table className="preview-table">
+                    <thead>
+                      <tr>
+                        {previewData.headers.map((header, index) => (
+                          <th key={index}>{header}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previewData.rows.slice(0, 10).map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                          {row.map((cell, cellIndex) => (
+                            <td key={cellIndex}>{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p>No data available</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
       <div className="search-bar">
         <div className="search-item">
           <input

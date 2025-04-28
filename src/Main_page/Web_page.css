@@ -557,3 +557,112 @@ option:hover {
   color: #2c3e50;
   font-weight: 500;
 }
+
+/* New styles for preview functionality */
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.preview-btn {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.preview-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
+}
+
+.preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.preview-modal {
+  background-color: white;
+  border-radius: 8px;
+  width: 95%; /* Increased from 90% */
+  max-width: none; /* Remove max-width constraint */
+  height: 90vh; /* Make it taller */
+  margin: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.preview-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.preview-content {
+  padding: 20px;
+  overflow: auto;
+  height: calc(90vh - 70px); /* Adjust height to account for header */
+}
+
+.preview-table {
+  width: auto; /* Allow table to expand based on content */
+  min-width: 100%; /* Ensure it takes at least full width */
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.preview-table th,
+.preview-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.preview-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.preview-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.preview-table tr:hover {
+  background-color: #f5f5f5;
+}
