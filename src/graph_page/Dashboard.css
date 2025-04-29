@@ -228,3 +228,193 @@
     margin-bottom: 10px;
     font-weight: 500;
 }
+/* Add these styles to Dashboard.css */
+
+/* Ingredient configuration section styles */
+.ingredient-config-section {
+    margin-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 15px;
+  }
+  
+  .ingredient-config-toggle {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .ingredient-config-toggle:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .ingredients-panel {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9fafb;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .config-text {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    color: #4b5563;
+  }
+  
+  .total-quantity-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+  .ingredients-list-sidebar {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .ingredient-item-sidebar {
+    margin-bottom: 6px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .ingredient-row-sidebar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .ingredient-row-sidebar:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .ingredient-name-sidebar {
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+  
+  .ingredient-details-sidebar {
+    display: flex;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+  
+  .ingredient-expanded-sidebar {
+    padding: 10px;
+    background-color: #f3f4f6;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .source-row-sidebar {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .source-row-sidebar:last-child {
+    margin-bottom: 5px;
+    border-bottom: none;
+  }
+  
+  .source-select-sidebar {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+  }
+  
+  .source-inputs-sidebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  
+  .source-input-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .source-percentage-input-sidebar {
+    width: 50px;
+    padding: 4px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+  
+  .source-weight-sidebar {
+    font-size: 0.8rem;
+    color: #6b7280;
+    flex-grow: 1;
+    text-align: center;
+  }
+  
+  .remove-source-btn-sidebar {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .remove-source-btn-sidebar:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+  
+  .sliders-sidebar {
+    margin-top: 6px;
+  }
+  
+  .slider-group-sidebar {
+    margin-bottom: 6px;
+  }
+  
+  .slider-group-sidebar label {
+    display: block;
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+    color: #4b5563;
+  }
+  
+  .slider-group-sidebar input[type="range"] {
+    width: 100%;
+    height: 4px;
+  }
+  
+  .add-country-btn-sidebar {
+    width: 100%;
+    padding: 4px 8px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  
+  .add-country-btn-sidebar:hover {
+    background-color: #2563eb;
+  }

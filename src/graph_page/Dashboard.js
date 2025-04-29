@@ -37,11 +37,145 @@ const Dashboard = () => {
   const [customerAbsorption, setCustomerAbsorption] = useState(25);
   const [remainingImpact, setRemainingImpact] = useState(25);
 
+  // Add state for ingredients configuration
+  const [showIngredientConfig, setShowIngredientConfig] = useState(false);
+  const [expandedIngredient, setExpandedIngredient] = useState(null);
+  const [totalQuantity, setTotalQuantity] = useState(0); // Changed from 100 to 0
+  const [ingredientSources, setIngredientSources] = useState({});
+
+  // Updated ingredients data with percentages
+  const ingredients = [
+    { id: 1, name: 'Cocoa Butter', percentage: 32.79, details: '' },
+    { id: 2, name: 'Sugar', percentage: 38.26, details: '' },
+    { id: 3, name: 'Milk Powder', percentage: 27.37, details: '' },
+    { id: 4, name: 'Vanilla Extract', percentage: 1.09, details: '' },
+    { id: 5, name: 'Lecithin', percentage: 0.49, details: '' }
+  ];
+
+  // Updated country options
+  const countryOptions = [
+    'United States',
+    'China',
+    'India',
+    'Brazil',
+    'European Union',
+    'New Zealand',
+    'Madagascar'
+  ];
+
   const productOptions = {
     'Automotive': ['Cars', 'Spare Parts', 'Tires'],
     'Electronics': ['Smartphones', 'Laptops', 'Tablets'],
     'Textiles': ['Cotton', 'Silk', 'Wool'],
     'Food & Beverages': ['Snickers', 'Mars', 'Twix']
+  };
+
+  // Add tariff constant
+  const TARIFF_PERCENTAGE = 5;
+
+  // Initialize ingredient sources and controls when ingredient is expanded
+  const initializeIngredientSources = (ingredientId) => {
+    if (!ingredientSources[ingredientId]) {
+      setIngredientSources(prev => ({
+        ...prev,
+        [ingredientId]: [{ 
+          country: '', 
+          percentage: 100,
+          supplierAbsorption: 0,
+          manufacturerAbsorption: 0,
+          cashPaymentDelay: 0
+        }]
+      }));
+    }
+  };
+
+  // Handle adding a new country for an ingredient
+  const addCountrySource = (ingredientId) => {
+    const currentSources = ingredientSources[ingredientId] || [];
+    // Only add if there's room to add more (sum < 100%)
+    const currentTotal = currentSources.reduce((sum, source) => sum + (parseFloat(source.percentage) || 0), 0);
+
+    if (currentTotal < 100) {
+      const newSources = [
+        ...currentSources,
+        { country: '', percentage: 100 - currentTotal, supplierAbsorption: 0, manufacturerAbsorption: 0, cashPaymentDelay: 0 }
+      ];
+      setIngredientSources(prev => ({
+        ...prev,
+        [ingredientId]: newSources
+      }));
+    } else {
+      alert("Total percentage already equals 100%. Adjust existing values before adding more.");
+    }
+  };
+
+  // Handle removing a country source
+  const removeCountrySource = (ingredientId, index) => {
+    const newSources = [...ingredientSources[ingredientId]];
+    newSources.splice(index, 1);
+
+    // If removing the last source, add one empty source
+    if (newSources.length === 0) {
+      newSources.push({ country: '', percentage: 100, supplierAbsorption: 0, manufacturerAbsorption: 0, cashPaymentDelay: 0 });
+    }
+
+    setIngredientSources(prev => ({
+      ...prev,
+      [ingredientId]: newSources
+    }));
+  };
+
+  // Handle country change for a source
+  const handleSourceCountryChange = (ingredientId, index, country) => {
+    const newSources = [...ingredientSources[ingredientId]];
+    newSources[index].country = country;
+    setIngredientSources(prev => ({
+      ...prev,
+      [ingredientId]: newSources
+    }));
+  };
+
+  // Handle percentage change for a source
+  const handleSourcePercentageChange = (ingredientId, index, percentage) => {
+    const value = Math.min(100, Math.max(0, parseFloat(percentage) || 0));
+    const newSources = [...ingredientSources[ingredientId]];
+    newSources[index].percentage = value;
+
+    setIngredientSources(prev => ({
+      ...prev,
+      [ingredientId]: newSources
+    }));
+  };
+
+  // Handle slider changes
+  const handleSliderChange = (ingredientId, index, field, value) => {
+    const newSources = [...ingredientSources[ingredientId]];
+    newSources[index][field] = value;
+    setIngredientSources(prev => ({
+      ...prev,
+      [ingredientId]: newSources
+    }));
+  };
+
+  // Calculate weight based on ingredient percentage, total quantity, and source percentage
+  const calculateSourceWeight = (ingredientPercentage, sourcePercentage) => {
+    const baseWeight = (ingredientPercentage * totalQuantity / 100);
+    const sourceWeight = (baseWeight * (sourcePercentage / 100) * (quantity || 1)).toFixed(2);
+    return sourceWeight;
+  };
+
+  const toggleIngredient = (id) => {
+    if (expandedIngredient === id) {
+      setExpandedIngredient(null);
+    } else {
+      setExpandedIngredient(id);
+      initializeIngredientSources(id);
+    }
+  };
+
+  const calculateIngredientWeight = (percentage) => {
+    const baseWeight = (percentage * totalQuantity / 100);
+    return (baseWeight * (quantity || 1)).toFixed(2);
   };
 
   const handleDocumentation = () => {
@@ -245,6 +379,131 @@ const Dashboard = () => {
                 disabled
                 className="tariff-input-disabled"
               />
+            </div>
+
+            <div className="ingredient-config-section">
+              <button 
+                className="ingredient-config-toggle" 
+                onClick={() => setShowIngredientConfig(!showIngredientConfig)}
+              >
+                {showIngredientConfig ? 'Hide Ingredients' : 'Configure Ingredients'}
+              </button>
+              
+              {showIngredientConfig && (
+                <div className="ingredients-panel">
+                  <p className="config-text">Configure the ingredients quantities and specifications:</p>
+                  <div className="ingredients-list-sidebar">
+                    {ingredients.map(ingredient => (
+                      <div key={ingredient.id} className="ingredient-item-sidebar">
+                        <div 
+                          className="ingredient-row-sidebar" 
+                          onClick={() => toggleIngredient(ingredient.id)}
+                        >
+                          <div className="ingredient-name-sidebar">{ingredient.name}</div>
+                          <div className="ingredient-details-sidebar">
+                            <span>{ingredient.percentage}%</span>
+                            <span>{calculateIngredientWeight(ingredient.percentage)}g</span>
+                            <span>{expandedIngredient === ingredient.id ? '▼' : '▶'}</span>
+                          </div>
+                        </div>
+
+                        {expandedIngredient === ingredient.id && (
+                          <div className="ingredient-expanded-sidebar">
+                            {ingredientSources[ingredient.id]?.map((source, index) => (
+                              <div key={index} className="source-row-sidebar">
+                                <select
+                                  className="source-select-sidebar"
+                                  value={source.country}
+                                  onChange={(e) => handleSourceCountryChange(ingredient.id, index, e.target.value)}
+                                >
+                                  <option value="">Country</option>
+                                  {countryOptions.map(country => (
+                                    <option key={country} value={country}>{country}</option>
+                                  ))}
+                                </select>
+                                
+                                <div className="source-inputs-sidebar">
+                                  <div className="source-input-group">
+                                    <input
+                                      type="number"
+                                      value={source.percentage}
+                                      onChange={(e) => handleSourcePercentageChange(ingredient.id, index, e.target.value)}
+                                      min="0"
+                                      max="100"
+                                      className="source-percentage-input-sidebar"
+                                    />
+                                    <span>%</span>
+                                  </div>
+                                  
+                                  <div className="source-weight-sidebar">
+                                    {calculateSourceWeight(ingredient.percentage, source.percentage)}g
+                                  </div>
+                                  
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      removeCountrySource(ingredient.id, index);
+                                    }}
+                                    className="remove-source-btn-sidebar"
+                                    disabled={ingredientSources[ingredient.id]?.length <= 1}
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+
+                                <div className="sliders-sidebar">
+                                  <div className="slider-group-sidebar">
+                                    <label>Supplier: {source.supplierAbsorption}%</label>
+                                    <input
+                                      type="range"
+                                      min="0"
+                                      max="100"
+                                      value={source.supplierAbsorption || 0}
+                                      onChange={(e) => handleSliderChange(ingredient.id, index, 'supplierAbsorption', parseInt(e.target.value))}
+                                    />
+                                  </div>
+                                  
+                                  <div className="slider-group-sidebar">
+                                    <label>Manufacturer: {source.manufacturerAbsorption}%</label>
+                                    <input
+                                      type="range"
+                                      min="0"
+                                      max="100"
+                                      value={source.manufacturerAbsorption || 0}
+                                      onChange={(e) => handleSliderChange(ingredient.id, index, 'manufacturerAbsorption', parseInt(e.target.value))}
+                                    />
+                                  </div>
+                                  
+                                  <div className="slider-group-sidebar">
+                                    <label>Payment Delay: {source.cashPaymentDelay} days</label>
+                                    <input
+                                      type="range"
+                                      min="0"
+                                      max="90"
+                                      value={source.cashPaymentDelay || 0}
+                                      onChange={(e) => handleSliderChange(ingredient.id, index, 'cashPaymentDelay', parseInt(e.target.value))}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                            
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addCountrySource(ingredient.id);
+                              }}
+                              className="add-country-btn-sidebar"
+                            >
+                              Add Country
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <button className="simulate-button">Update Simulation</button>
