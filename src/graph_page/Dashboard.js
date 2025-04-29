@@ -12,8 +12,6 @@ const Dashboard = () => {
   const [category, setCategory] = useState('Automotive');
   const [productValue, setProductValue] = useState(100);
   const [quantity, setQuantity] = useState(1);
-  const [date, setDate] = useState('2025-04-23');
-  const [model, setModel] = useState('advanced');
   const [tariffRate, setTariffRate] = useState(30);  // Hardcoded to 30%
   const [supplierAbsorption, setSupplierAbsorption] = useState(25);
   const [manufacturerAbsorption, setManufacturerAbsorption] = useState(25);
@@ -219,105 +217,6 @@ const Dashboard = () => {
                 onChange={(e) => setQuantity(Number(e.target.value))} 
                 min="1"
               />
-            </div>
-
-            <div>
-              <label>Date</label>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
-
-            <div className="tariff-model">
-              <label>Tariff Model</label>
-              <div className="radio-group">
-                <label>
-                  <input 
-                    type="radio" 
-                    value="basic" 
-                    checked={model === 'basic'} 
-                    onChange={() => setModel('basic')} 
-                  /> 
-                  Basic
-                </label>
-                <label>
-                  <input 
-                    type="radio" 
-                    value="advanced" 
-                    checked={model === 'advanced'} 
-                    onChange={() => setModel('advanced')} 
-                  /> 
-                  Advanced
-                </label>
-              </div>
-            </div>
-
-            {/* Tariff Rate Slider */}
-            <div className="slider-control">
-              <div className="current-tariff">Current Tariff Rate: 25%</div> {/* Show current tariff rate */}
-              <label>Change IN Tariff Rate: {tariffRate}%</label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={tariffRate}
-                onChange={(e) => setTariffRate(Number(e.target.value))}
-                className="slider"
-              />
-              <div className="slider-ticks">
-                <span>0%</span>
-                <span>20%</span>
-                <span>40%</span>
-                <span>60%</span>
-                <span>80%</span>
-                <span>100%</span>
-              </div>
-            </div>
-
-            {/* Absorption Sliders */}
-            <div className="slider-control">
-              <label>
-                Supplier Absorption: {supplierAbsorption}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={supplierAbsorption}
-                onChange={(e) => handleAbsorptionChange('supplier', e.target.value)}
-                className="slider"
-              />
-            </div>
-
-            <div className="slider-control">
-              <label>
-                Manufacturer Absorption: {manufacturerAbsorption}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={manufacturerAbsorption}
-                onChange={(e) => handleAbsorptionChange('manufacturer', e.target.value)}
-                className="slider"
-              />
-            </div>
-
-            <div className="slider-control">
-              <label>
-                Customer Absorption: {customerAbsorption}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={customerAbsorption}
-                onChange={(e) => handleAbsorptionChange('customer', e.target.value)}
-                className="slider"
-              />
-            </div>
-
-            <div className="absorption-summary">
-              <p>Total Allocated: {supplierAbsorption + manufacturerAbsorption + customerAbsorption}%</p>
-              <p>Remaining Impact: {remainingImpact}%</p>
             </div>
 
             <button className="simulate-button">Update Simulation</button>

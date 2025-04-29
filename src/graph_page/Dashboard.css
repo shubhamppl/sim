@@ -94,58 +94,86 @@
 .tariff-sidebar {
     width: 300px;
     background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.tariff-sidebar > div:first-child {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.tariff-sidebar > p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
 }
 
 .tariff-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
+    gap: 20px;
+}
+
+.tariff-form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tariff-form label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
 }
 
 .tariff-form select,
 .tariff-form input {
     width: 100%;
-    padding: 8px;
+    padding: 10px 12px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s ease;
+    background-color: #f8f9fa;
 }
 
-.slider-control {
-    margin-top: 10px;
+.tariff-form select:hover,
+.tariff-form input:hover {
+    border-color: #3498db;
 }
 
-.slider {
-    width: 100%;
-    margin-top: 10px;
-}
-
-.slider-ticks {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 5px;
-    font-size: 12px;
-    color: #666;
-}
-
-.absorption-summary {
-    margin-top: 15px;
-    padding: 10px;
-    background: #f5f5f5;
-    border-radius: 4px;
+.tariff-form select:focus,
+.tariff-form input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .simulate-button {
-    margin-top: 20px;
-    padding: 10px;
+    margin-top: 30px;
+    padding: 12px;
     background: #3498db;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.simulate-button:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .tariff-main {
