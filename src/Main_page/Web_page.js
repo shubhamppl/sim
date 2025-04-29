@@ -245,7 +245,14 @@ const WebPage = () => {
   };
 
   const handleShowResults = () => {
-    navigate('/results');
+    navigate('/results', {
+      state: {
+        selectedCountry: selectedCountry,
+        selectedCategory: selectedCategory, 
+        selectedProduct: selectedProduct,
+        selectedQuantity: selectedType
+      }
+    });
   };
 
   return (

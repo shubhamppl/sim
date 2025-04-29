@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Upload.css';
+import * as XLSX from 'xlsx';
 
 const dbName = "TariffDB";
 const storeName = "files";
@@ -56,20 +57,40 @@ const Upload = () => {
     setPreviewType('upload');
     
     if (selectedFile) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const content = event.target.result;
-        const lines = content.split('\n');
-        
-        const headerRow = lines[0].split(',').map(header => header.trim());
-        setHeaders(headerRow);
+      const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
+      
+      if (fileExtension === 'csv') {
+        // Handle CSV files
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const content = event.target.result;
+          const lines = content.split('\n');
+          
+          const headerRow = lines[0].split(',').map(header => header.trim());
+          setHeaders(headerRow);
 
-        const dataRows = lines.slice(1, 11).map(line => 
-          line.split(',').map(cell => cell.trim())
-        );
-        setRows(dataRows);
-      };
-      reader.readAsText(selectedFile);
+          const dataRows = lines.slice(1).map(line => 
+            line.split(',').map(cell => cell.trim())
+          );
+          setRows(dataRows.slice(0, 10)); // Show first 10 rows
+        };
+        reader.readAsText(selectedFile);
+      } else if (['xlsx', 'xls'].includes(fileExtension)) {
+        // Handle Excel files
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const data = new Uint8Array(event.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+          
+          if (jsonData.length > 0) {
+            setHeaders(jsonData[0]);
+            setRows(jsonData.slice(1, 11)); // Show first 10 rows
+          }
+        };
+        reader.readAsArrayBuffer(selectedFile);
+      }
     }
   };
 

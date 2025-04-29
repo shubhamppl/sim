@@ -1,22 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Dashboard.css';
 
 Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [country, setCountry] = useState('United States');
-  const [category, setCategory] = useState('Automotive');
-  const [productValue, setProductValue] = useState(100);
-  const [quantity, setQuantity] = useState(1);
+  const location = useLocation();
+
+  // Add logging to debug state passing
+  useEffect(() => {
+    console.log('Location state:', location.state);
+  }, [location]);
+
+  // Get and set default values from location state
+  const [country, setCountry] = useState(location.state?.selectedCountry || 'United States');
+  const [category, setCategory] = useState(location.state?.selectedCategory || 'Food & Beverages');
+  const [product, setProduct] = useState(location.state?.selectedProduct || 'Snickers');
+  const [quantity, setQuantity] = useState(location.state?.selectedQuantity || 1);
+
+  // Update values when location state changes
+  useEffect(() => {
+    if (location.state) {
+      setCountry(location.state.selectedCountry);
+      setCategory(location.state.selectedCategory);
+      setProduct(location.state.selectedProduct);
+      setQuantity(location.state.selectedQuantity);
+    }
+  }, [location.state]);
+
   const [tariffRate, setTariffRate] = useState(30);  // Hardcoded to 30%
   const [supplierAbsorption, setSupplierAbsorption] = useState(25);
   const [manufacturerAbsorption, setManufacturerAbsorption] = useState(25);
   const [customerAbsorption, setCustomerAbsorption] = useState(25);
   const [remainingImpact, setRemainingImpact] = useState(25);
+
+  const productOptions = {
+    'Automotive': ['Cars', 'Spare Parts', 'Tires'],
+    'Electronics': ['Smartphones', 'Laptops', 'Tablets'],
+    'Textiles': ['Cotton', 'Silk', 'Wool'],
+    'Food & Beverages': ['Snickers', 'Mars', 'Twix']
+  };
 
   const handleDocumentation = () => {
     alert('Documentation coming soon!');
@@ -32,7 +58,7 @@ const Dashboard = () => {
 
   // Calculate tariff impact
   const calculateTariffImpact = () => {
-    const totalCost = productValue * quantity;
+    const totalCost = quantity * 100; // Assuming a fixed product value of 100 for simplicity
     const tariffAmount = totalCost * (tariffRate / 100);
     
     // Calculate absorption amounts based on percentages
@@ -183,29 +209,31 @@ const Dashboard = () => {
           <div className="tariff-form">
             <div>
               <label>Country</label>
-              <select value={country} onChange={(e) => setCountry(e.target.value)}>
-                <option>United States</option>
-                <option>Canada</option>
-                <option>Mexico</option>
-              </select>
+              <input 
+                type="text" 
+                value={country}
+                disabled
+                className="tariff-input-disabled"
+              />
             </div>
 
             <div>
               <label>Product Category</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option>Automotive</option>
-                <option>Electronics</option>
-                <option>Textiles</option>
-              </select>
+              <input 
+                type="text" 
+                value={category}
+                disabled
+                className="tariff-input-disabled"
+              />
             </div>
 
             <div>
-              <label>Product Value ($)</label>
+              <label>Product</label>
               <input 
-                type="number" 
-                value={productValue} 
-                onChange={(e) => setProductValue(Number(e.target.value))} 
-                min="1"
+                type="text" 
+                value={product}
+                disabled
+                className="tariff-input-disabled"
               />
             </div>
 
@@ -213,9 +241,9 @@ const Dashboard = () => {
               <label>Quantity</label>
               <input 
                 type="number" 
-                value={quantity} 
-                onChange={(e) => setQuantity(Number(e.target.value))} 
-                min="1"
+                value={quantity}
+                disabled
+                className="tariff-input-disabled"
               />
             </div>
 
