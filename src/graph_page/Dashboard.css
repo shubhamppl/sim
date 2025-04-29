@@ -1,124 +1,189 @@
 .dashboard-container {
-  min-height: 100vh;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
 }
 
 .header {
-  background-color: #f0f0f0;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #f0f0f0;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .musigma-logo {
-  height: 40px;
-  width: auto;
+    height: 40px;
+    width: auto;
 }
 
 .back-btn {
-  padding: 8px 16px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
 .back-btn:hover {
-  background-color: #2980b9;
+    background-color: #2980b9;
 }
 
 .dashboard-content {
-  flex: 1;
-  padding: 20px;
+    flex: 1;
+    padding: 20px;
 }
 
-.dashboard-layout {
-  display: flex;
-  flex: 1;
-  height: calc(100vh - 70px);
+.tariff-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-shrink: 0;
 }
 
-.sidebar {
-  width: 250px;
-  background-color: #2c3e50;
-  padding: 20px 0;
-  color: white;
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 24px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.header-btn {
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
 }
 
-.sidebar-item:hover {
-  background-color: #34495e;
+.header-btn:hover {
+    background-color: #2980b9;
 }
 
-.sidebar-item.active {
-  background-color: #3498db;
+.back-button {
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-.sidebar-icon {
-  margin-right: 12px;
-  font-size: 20px;
+.header-title {
+    font-size: 1.5rem;
+    font-weight: 500;
 }
 
-.sidebar-label {
-  font-size: 16px;
+.tariff-container {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+    height: calc(100vh - 80px);
 }
 
-.main-content {
-  flex: 1;
-  padding: 30px;
-  background-color: #f8f9fa;
-  overflow-y: auto;
+.tariff-sidebar {
+    width: 300px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.content-editor {
-  width: 100%;
-  min-height: 400px;
-  padding: 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 16px;
-  line-height: 1.6;
-  resize: vertical;
+.tariff-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
 }
 
-.content-display {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  min-height: 400px;
+.tariff-form select,
+.tariff-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
-.header-controls {
-  display: flex;
-  gap: 15px;
+.slider-control {
+    margin-top: 10px;
 }
 
-.edit-btn {
-  padding: 8px 16px;
-  background-color: #27ae60;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
+.slider {
+    width: 100%;
+    margin-top: 10px;
 }
 
-.edit-btn:hover {
-  background-color: #219a52;
+.slider-ticks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #666;
+}
+
+.absorption-summary {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.simulate-button {
+    margin-top: 20px;
+    padding: 10px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tariff-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tariff-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.tariff-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.chart-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 400px;
+}
+
+.chart-wrapper {
+    height: 300px;
+}
+
+.amount-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: 500;
 }
