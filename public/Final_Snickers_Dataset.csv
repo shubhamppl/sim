@@ -1,0 +1,51 @@
+﻿HS_Code,To_Country,From_Country,Product_Category,Product_Sub_Category,Raw_Material_Name,Base_Price_Per_Unit,payment_term_days,Current_Tariff_Percent,Future_Tariff_Percent,Future_Tariff_Implementation_Date
+402,USA,India,Food & Beverages,Snickers,Milk Powder,454.61,45,16.55,21.78,2025-08-30 00:00:00
+402,USA,Malaysia,Food & Beverages,Snickers,Milk Powder,492.48,30,11.01,12.23,2025-07-24 00:00:00
+402,USA,Australia,Food & Beverages,Snickers,Milk Powder,543.42,90,12.03,8.93,2025-09-25 00:00:00
+402,USA,Mexico,Food & Beverages,Snickers,Milk Powder,421.41,90,8.06,18.46,2025-09-08 00:00:00
+402,USA,Germany,Food & Beverages,Snickers,Milk Powder,516.28,45,7.01,12.26,2025-10-27 00:00:00
+402,USA,Brazil,Food & Beverages,Snickers,Milk Powder,415.13,45,10.48,21.48,2025-11-10 00:00:00
+402,USA,China,Food & Beverages,Snickers,Milk Powder,556.7,45,21.05,24.06,2025-08-16 00:00:00
+402,USA,Vietnam,Food & Beverages,Snickers,Milk Powder,523.39,90,23.95,16.38,2025-07-30 00:00:00
+402,USA,Thailand,Food & Beverages,Snickers,Milk Powder,579.18,30,13.35,13.64,2025-09-06 00:00:00
+402,USA,Indonesia,Food & Beverages,Snickers,Milk Powder,539.34,30,5.27,16.88,2025-10-20 00:00:00
+1507,USA,Australia,Food & Beverages,Snickers,Lecithin,488.01,30,21.02,16.31,2025-08-13 00:00:00
+1507,USA,Thailand,Food & Beverages,Snickers,Lecithin,564.5,90,6.91,12.83,2025-11-04 00:00:00
+1507,USA,Mexico,Food & Beverages,Snickers,Lecithin,434.67,30,19.55,5.18,2025-10-23 00:00:00
+1507,USA,India,Food & Beverages,Snickers,Lecithin,419.75,45,10.7,15.7,2025-10-31 00:00:00
+1507,USA,Malaysia,Food & Beverages,Snickers,Lecithin,558.79,60,24.25,12.4,2025-09-28 00:00:00
+1507,USA,Brazil,Food & Beverages,Snickers,Lecithin,582.58,45,19.21,18.17,2025-08-11 00:00:00
+1507,USA,Germany,Food & Beverages,Snickers,Lecithin,520.34,60,17.47,8.99,2025-07-14 00:00:00
+1507,USA,Indonesia,Food & Beverages,Snickers,Lecithin,462.36,60,21.83,10.2,2025-07-05 00:00:00
+1507,USA,China,Food & Beverages,Snickers,Lecithin,486.75,60,24.77,15.32,2025-11-12 00:00:00
+1507,USA,Vietnam,Food & Beverages,Snickers,Lecithin,412.38,60,12.26,10.41,2025-08-11 00:00:00
+1701,USA,Mexico,Food & Beverages,Snickers,Sugar,427.42,90,21.92,24.58,2025-10-12 00:00:00
+1701,USA,Australia,Food & Beverages,Snickers,Sugar,409.05,60,18.44,21.9,2025-09-02 00:00:00
+1701,USA,Brazil,Food & Beverages,Snickers,Sugar,449.25,90,7.26,17.06,2025-10-31 00:00:00
+1701,USA,Malaysia,Food & Beverages,Snickers,Sugar,448.01,45,13.96,17.3,2025-09-14 00:00:00
+1701,USA,India,Food & Beverages,Snickers,Sugar,431.66,90,21.41,5.18,2025-08-22 00:00:00
+1701,USA,Vietnam,Food & Beverages,Snickers,Sugar,487.64,45,7.25,24.25,2025-09-25 00:00:00
+1701,USA,Germany,Food & Beverages,Snickers,Sugar,457.6,45,18.1,16.99,2025-11-15 00:00:00
+1701,USA,Indonesia,Food & Beverages,Snickers,Sugar,581.45,90,18.93,9.11,2025-08-20 00:00:00
+1701,USA,China,Food & Beverages,Snickers,Sugar,475.92,30,11.45,22,2025-08-18 00:00:00
+1701,USA,Thailand,Food & Beverages,Snickers,Sugar,474,45,14.6,11.57,2025-07-18 00:00:00
+1806,USA,Germany,Food & Beverages,Snickers,Cocoa Butter,556.84,45,21.67,18.04,2025-09-25 00:00:00
+1806,USA,Indonesia,Food & Beverages,Snickers,Cocoa Butter,588.04,30,20.5,13.39,2025-11-07 00:00:00
+1806,USA,Malaysia,Food & Beverages,Snickers,Cocoa Butter,497.16,30,16.91,7.41,2025-07-13 00:00:00
+1806,USA,Brazil,Food & Beverages,Snickers,Cocoa Butter,526.45,30,6.63,24.27,2025-08-16 00:00:00
+1806,USA,China,Food & Beverages,Snickers,Cocoa Butter,574.6,45,10.4,22.61,2025-07-23 00:00:00
+1806,USA,Vietnam,Food & Beverages,Snickers,Cocoa Butter,549.63,90,17.9,20.85,2025-09-02 00:00:00
+1806,USA,Australia,Food & Beverages,Snickers,Cocoa Butter,428.86,60,16.17,15.38,2025-08-25 00:00:00
+1806,USA,Mexico,Food & Beverages,Snickers,Cocoa Butter,405.45,45,15.47,21.73,2025-11-07 00:00:00
+1806,USA,Thailand,Food & Beverages,Snickers,Cocoa Butter,427.92,60,7.02,5.53,2025-08-03 00:00:00
+1806,USA,India,Food & Beverages,Snickers,Cocoa Butter,484,45,10.4,17.34,2025-07-26 00:00:00
+2008,USA,Mexico,Food & Beverages,Snickers,Vanilla Extract,435.44,90,23.06,5.43,2025-08-14 00:00:00
+2008,USA,Malaysia,Food & Beverages,Snickers,Vanilla Extract,571.23,90,19.22,6.84,2025-11-18 00:00:00
+2008,USA,India,Food & Beverages,Snickers,Vanilla Extract,459.77,60,17.52,23.61,2025-09-08 00:00:00
+2008,USA,Australia,Food & Beverages,Snickers,Vanilla Extract,520.76,30,15.29,19.11,2025-07-18 00:00:00
+2008,USA,Vietnam,Food & Beverages,Snickers,Vanilla Extract,423.38,60,22.56,24.03,2025-08-14 00:00:00
+2008,USA,Brazil,Food & Beverages,Snickers,Vanilla Extract,549.04,30,10.69,7.1,2025-10-15 00:00:00
+2008,USA,China,Food & Beverages,Snickers,Vanilla Extract,466.42,30,12.03,8.07,2025-07-16 00:00:00
+2008,USA,Indonesia,Food & Beverages,Snickers,Vanilla Extract,538.67,60,7.93,19.2,2025-10-21 00:00:00
+2008,USA,Germany,Food & Beverages,Snickers,Vanilla Extract,431.26,60,13.23,7.33,2025-10-18 00:00:00
+2008,USA,Thailand,Food & Beverages,Snickers,Vanilla Extract,419.15,90,13.94,13.06,2025-10-10 00:00:00

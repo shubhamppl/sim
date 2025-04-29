@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from './Login_page/login';
 import WebPage from './Main_page/Web_page';
 import Upload from './Import_data/Uplode';
+import Dashboard from './graph_page/Dashboard';
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
   {
     path: "/upload",
     element: <Upload />,
+  },
+  {
+    path: "/results",
+    element: <Dashboard />,
   }
 ]);
 

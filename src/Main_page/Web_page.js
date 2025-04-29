@@ -244,6 +244,10 @@ const WebPage = () => {
     }
   };
 
+  const handleShowResults = () => {
+    navigate('/results');
+  };
+
   return (
     <div className="tariff-simulator">
       <div className="header">
@@ -327,7 +331,7 @@ const WebPage = () => {
             list="countries"
           />
           <datalist id="countries">
-            <option value="United States" />
+            <option value="UnitedUnited Statess" />
             <option value="China" />
             <option value="India" />
             <option value="European Union" />
@@ -517,7 +521,9 @@ const WebPage = () => {
             ))}
           </div>
           <div className="show-results-container">
-            <button className="show-results-btn">Show Results</button>
+            <button className="show-results-btn" onClick={handleShowResults}>
+              Show Results
+            </button>
           </div>
         </div>
       )}
