@@ -10,18 +10,18 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Add logging to debug state passing
+  // Log state to debug
   useEffect(() => {
     console.log('Location state:', location.state);
   }, [location]);
 
-  // Get and set default values from location state
+  // Initialize state from passed data
   const [country, setCountry] = useState(location.state?.selectedCountry || 'United States');
   const [category, setCategory] = useState(location.state?.selectedCategory || 'Food & Beverages');
   const [product, setProduct] = useState(location.state?.selectedProduct || 'Snickers');
   const [quantity, setQuantity] = useState(location.state?.selectedQuantity || 1);
 
-  // Update values when location state changes
+  // Update state when location state changes
   useEffect(() => {
     if (location.state) {
       setCountry(location.state.selectedCountry);
@@ -31,19 +31,19 @@ const Dashboard = () => {
     }
   }, [location.state]);
 
+  // Tariff rate and absorption states
   const [tariffRate, setTariffRate] = useState(30);  // Hardcoded to 30%
   const [supplierAbsorption, setSupplierAbsorption] = useState(25);
   const [manufacturerAbsorption, setManufacturerAbsorption] = useState(25);
   const [customerAbsorption, setCustomerAbsorption] = useState(25);
   const [remainingImpact, setRemainingImpact] = useState(25);
 
-  // Add state for ingredients configuration
+  // Ingredient configurations
   const [showIngredientConfig, setShowIngredientConfig] = useState(false);
   const [expandedIngredient, setExpandedIngredient] = useState(null);
-  const [totalQuantity, setTotalQuantity] = useState(0); // Changed from 100 to 0
+  const [totalQuantity, setTotalQuantity] = useState(100); // Default 100g total
   const [ingredientSources, setIngredientSources] = useState({});
 
-  // Updated ingredients data with percentages
   const ingredients = [
     { id: 1, name: 'Cocoa Butter', percentage: 32.79, details: '' },
     { id: 2, name: 'Sugar', percentage: 38.26, details: '' },
@@ -52,15 +52,8 @@ const Dashboard = () => {
     { id: 5, name: 'Lecithin', percentage: 0.49, details: '' }
   ];
 
-  // Updated country options
   const countryOptions = [
-    'United States',
-    'China',
-    'India',
-    'Brazil',
-    'European Union',
-    'New Zealand',
-    'Madagascar'
+    'United States', 'China', 'India', 'Brazil', 'European Union', 'New Zealand', 'Madagascar'
   ];
 
   const productOptions = {
@@ -70,10 +63,8 @@ const Dashboard = () => {
     'Food & Beverages': ['Snickers', 'Mars', 'Twix']
   };
 
-  // Add tariff constant
   const TARIFF_PERCENTAGE = 5;
 
-  // Initialize ingredient sources and controls when ingredient is expanded
   const initializeIngredientSources = (ingredientId) => {
     if (!ingredientSources[ingredientId]) {
       setIngredientSources(prev => ({
@@ -89,72 +80,45 @@ const Dashboard = () => {
     }
   };
 
-  // Handle adding a new country for an ingredient
+  // Add, remove, and update ingredient sources
   const addCountrySource = (ingredientId) => {
     const currentSources = ingredientSources[ingredientId] || [];
-    // Only add if there's room to add more (sum < 100%)
     const currentTotal = currentSources.reduce((sum, source) => sum + (parseFloat(source.percentage) || 0), 0);
 
     if (currentTotal < 100) {
-      const newSources = [
-        ...currentSources,
-        { country: '', percentage: 100 - currentTotal, supplierAbsorption: 0, manufacturerAbsorption: 0, cashPaymentDelay: 0 }
-      ];
-      setIngredientSources(prev => ({
-        ...prev,
-        [ingredientId]: newSources
-      }));
+      const newSources = [...currentSources, { country: '', percentage: 100 - currentTotal, supplierAbsorption: 0, manufacturerAbsorption: 0, cashPaymentDelay: 0 }];
+      setIngredientSources(prev => ({ ...prev, [ingredientId]: newSources }));
     } else {
       alert("Total percentage already equals 100%. Adjust existing values before adding more.");
     }
   };
 
-  // Handle removing a country source
   const removeCountrySource = (ingredientId, index) => {
     const newSources = [...ingredientSources[ingredientId]];
     newSources.splice(index, 1);
-
-    // If removing the last source, add one empty source
     if (newSources.length === 0) {
       newSources.push({ country: '', percentage: 100, supplierAbsorption: 0, manufacturerAbsorption: 0, cashPaymentDelay: 0 });
     }
-
-    setIngredientSources(prev => ({
-      ...prev,
-      [ingredientId]: newSources
-    }));
+    setIngredientSources(prev => ({ ...prev, [ingredientId]: newSources }));
   };
 
-  // Handle country change for a source
   const handleSourceCountryChange = (ingredientId, index, country) => {
     const newSources = [...ingredientSources[ingredientId]];
     newSources[index].country = country;
-    setIngredientSources(prev => ({
-      ...prev,
-      [ingredientId]: newSources
-    }));
+    setIngredientSources(prev => ({ ...prev, [ingredientId]: newSources }));
   };
 
-  // Handle percentage change for a source
   const handleSourcePercentageChange = (ingredientId, index, percentage) => {
     const value = Math.min(100, Math.max(0, parseFloat(percentage) || 0));
     const newSources = [...ingredientSources[ingredientId]];
     newSources[index].percentage = value;
-
-    setIngredientSources(prev => ({
-      ...prev,
-      [ingredientId]: newSources
-    }));
+    setIngredientSources(prev => ({ ...prev, [ingredientId]: newSources }));
   };
 
-  // Handle slider changes
   const handleSliderChange = (ingredientId, index, field, value) => {
     const newSources = [...ingredientSources[ingredientId]];
     newSources[index][field] = value;
-    setIngredientSources(prev => ({
-      ...prev,
-      [ingredientId]: newSources
-    }));
+    setIngredientSources(prev => ({ ...prev, [ingredientId]: newSources }));
   };
 
   // Calculate weight based on ingredient percentage, total quantity, and source percentage
@@ -392,6 +356,8 @@ const Dashboard = () => {
               {showIngredientConfig && (
                 <div className="ingredients-panel">
                   <p className="config-text">Configure the ingredients quantities and specifications:</p>
+
+                  
                   <div className="ingredients-list-sidebar">
                     {ingredients.map(ingredient => (
                       <div key={ingredient.id} className="ingredient-item-sidebar">
