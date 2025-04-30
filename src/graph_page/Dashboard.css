@@ -86,18 +86,17 @@
 
 .tariff-container {
     display: flex;
-    gap: 30px;
-    padding: 20px;
-    height: calc(100vh - 80px);
+    min-height: calc(100vh - 60px);
 }
 
 .tariff-sidebar {
-    width: 320px;  /* Changed from 300px */
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border: 1px solid #e0e0e0;
+    width: 350px;
+    min-width: 350px;
+    padding: 20px;
+    background: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    overflow-y: auto;
+    max-height: calc(100vh - 60px);
 }
 
 .tariff-sidebar > div:first-child {
@@ -125,7 +124,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding-right: 10px;  /* Added padding to the container */
+    padding-right: 10px;
 }
 
 .tariff-form label {
@@ -167,11 +166,12 @@
     color: #666;
     background-color: #f5f5f5;
     cursor: not-allowed;
-    box-sizing: border-box;  /* Added to include padding in width calculation */
+    box-sizing: border-box;
 }
 
 .simulate-button {
-    margin-top: 30px;
+    margin-top: 20px;
+    width: 100%;
     padding: 12px;
     background: #3498db;
     color: white;
@@ -191,9 +191,9 @@
 
 .tariff-main {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(100vh - 60px);
 }
 
 .tariff-stats {
@@ -237,9 +237,9 @@
     margin-top: 20px;
     border-top: 1px solid #e5e7eb;
     padding-top: 15px;
-  }
-  
-  .ingredient-config-toggle {
+}
+
+.ingredient-config-toggle {
     width: 100%;
     padding: 8px 12px;
     background-color: #f3f4f6;
@@ -248,125 +248,131 @@
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s ease;
-  }
-  
-  .ingredient-config-toggle:hover {
+}
+
+.ingredient-config-toggle:hover {
     background-color: #e5e7eb;
-  }
-  
-  .ingredients-panel {
+}
+
+.ingredients-panel {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 10px;
     margin-top: 10px;
     padding: 10px;
     background-color: #f9fafb;
     border-radius: 4px;
     border: 1px solid #e5e7eb;
-  }
-  
-  .config-text {
+}
+
+.config-text {
     font-size: 0.85rem;
     margin-bottom: 10px;
     color: #4b5563;
-  }
-  
-  .total-quantity-input {
+}
+
+.total-quantity-input {
     width: 100%;
     padding: 6px 8px;
     border: 1px solid #d1d5db;
     border-radius: 4px;
     margin-bottom: 10px;
-  }
-  
-  .ingredients-list-sidebar {
+}
+
+.ingredients-list-sidebar {
     max-height: 300px;
     overflow-y: auto;
-  }
-  
-  .ingredient-item-sidebar {
+}
+
+.ingredient-item-sidebar {
     margin-bottom: 6px;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
     overflow: hidden;
-  }
-  
-  .ingredient-row-sidebar {
+}
+
+.ingredient-row-sidebar {
     display: flex;
     justify-content: space-between;
     padding: 8px 10px;
     background-color: white;
     cursor: pointer;
     transition: background-color 0.2s;
-  }
-  
-  .ingredient-row-sidebar:hover {
+}
+
+.ingredient-row-sidebar:hover {
     background-color: #f3f4f6;
-  }
-  
-  .ingredient-name-sidebar {
+}
+
+.ingredient-name-sidebar {
     font-weight: 500;
     font-size: 0.85rem;
-  }
-  
-  .ingredient-details-sidebar {
+}
+
+.ingredient-details-sidebar {
     display: flex;
     gap: 10px;
     font-size: 0.8rem;
     color: #6b7280;
-  }
-  
-  .ingredient-expanded-sidebar {
+}
+
+.ingredient-expanded-sidebar {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.source-row-sidebar {
+    margin-bottom: 15px;
     padding: 10px;
-    background-color: #f3f4f6;
-    border-top: 1px solid #e5e7eb;
-  }
-  
-  .source-row-sidebar {
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .source-row-sidebar:last-child {
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+.source-row-sidebar:last-child {
     margin-bottom: 5px;
     border-bottom: none;
-  }
-  
-  .source-select-sidebar {
+}
+
+.source-select-sidebar {
     width: 100%;
+    margin-bottom: 10px;
     padding: 4px 6px;
     border: 1px solid #d1d5db;
     border-radius: 4px;
     font-size: 0.8rem;
-    margin-bottom: 6px;
-  }
-  
-  .source-inputs-sidebar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-  }
-  
-  .source-input-group {
+}
+
+.source-inputs-sidebar {
     display: flex;
     align-items: center;
-  }
-  
-  .source-percentage-input-sidebar {
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.source-input-group {
+    display: flex;
+    align-items: center;
+}
+
+.source-percentage-input-sidebar {
     width: 50px;
     padding: 4px;
     border: 1px solid #d1d5db;
     border-radius: 4px;
     font-size: 0.8rem;
-  }
-  
-  .source-weight-sidebar {
+}
+
+.source-weight-sidebar {
     font-size: 0.8rem;
     color: #6b7280;
     flex-grow: 1;
     text-align: center;
-  }
-  
-  .remove-source-btn-sidebar {
+}
+
+.remove-source-btn-sidebar {
     background-color: #ef4444;
     color: white;
     border: none;
@@ -378,34 +384,34 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .remove-source-btn-sidebar:disabled {
+}
+
+.remove-source-btn-sidebar:disabled {
     background-color: #9ca3af;
     cursor: not-allowed;
-  }
-  
-  .sliders-sidebar {
+}
+
+.sliders-sidebar {
     margin-top: 6px;
-  }
-  
-  .slider-group-sidebar {
-    margin-bottom: 6px;
-  }
-  
-  .slider-group-sidebar label {
+}
+
+.slider-group-sidebar {
+    margin: 10px 0;
+}
+
+.slider-group-sidebar label {
     display: block;
     font-size: 0.75rem;
     margin-bottom: 2px;
     color: #4b5563;
-  }
-  
-  .slider-group-sidebar input[type="range"] {
+}
+
+.slider-group-sidebar input[type="range"] {
     width: 100%;
     height: 4px;
-  }
-  
-  .add-country-btn-sidebar {
+}
+
+.add-country-btn-sidebar {
     width: 100%;
     padding: 4px 8px;
     background-color: #3b82f6;
@@ -415,8 +421,8 @@
     font-size: 0.8rem;
     cursor: pointer;
     margin-top: 6px;
-  }
-  
-  .add-country-btn-sidebar:hover {
+}
+
+.add-country-btn-sidebar:hover {
     background-color: #2563eb;
-  }
+}
