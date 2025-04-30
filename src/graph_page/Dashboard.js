@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import TariffChart from './TariffChart';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -251,6 +252,19 @@ const Dashboard = () => {
     navigate('/simulator');
   };
 
+  // Add this function to calculate cash flow data
+  const calculateCashFlow = () => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const currentTariff = results.tariffAmount;
+    const futureTariff = currentTariff * 1.2; // Assuming 20% increase in future
+
+    return months.map((month, index) => ({
+      month,
+      immediatePayment: -currentTariff,
+      delayedPayment: index < 2 ? 0 : -futureTariff, // Showing impact after 2 months
+    }));
+  };
+
   return (
     <div>
       <div className="tariff-header">
@@ -468,6 +482,38 @@ const Dashboard = () => {
             customerAbsorption={customerAbsorption}
             remainingImpact={remainingImpact}
           />
+
+          <section className="cash-flow-chart">
+            <h3>Cash Flow Impact Analysis</h3>
+            <div className="chart-wrapper">
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart
+                  data={calculateCashFlow()}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="immediatePayment"
+                    stroke="#8884d8"
+                    name="Immediate Payment"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="delayedPayment"
+                    stroke="#82ca9d"
+                    name="Delayed Payment"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
         </main>
       </div>
     </div>
