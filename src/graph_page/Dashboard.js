@@ -1,27 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { Chart, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { useNavigate, useLocation } from 'react-router-dom';
+import TariffChart from './TariffChart';
 import './Dashboard.css';
-
-Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Log state to debug
   useEffect(() => {
     console.log('Location state:', location.state);
   }, [location]);
 
-  // Initialize state from passed data
   const [country, setCountry] = useState(location.state?.selectedCountry || 'United States');
   const [category, setCategory] = useState(location.state?.selectedCategory || 'Food & Beverages');
   const [product, setProduct] = useState(location.state?.selectedProduct || 'Snickers');
   const [quantity, setQuantity] = useState(location.state?.selectedQuantity || 1);
 
-  // Update state when location state changes
   useEffect(() => {
     if (location.state) {
       setCountry(location.state.selectedCountry);
@@ -31,18 +25,24 @@ const Dashboard = () => {
     }
   }, [location.state]);
 
-  // Tariff rate and absorption states
-  const [tariffRate, setTariffRate] = useState(30);  // Hardcoded to 30%
+  const [tariffRate, setTariffRate] = useState(30);
   const [supplierAbsorption, setSupplierAbsorption] = useState(25);
   const [manufacturerAbsorption, setManufacturerAbsorption] = useState(25);
   const [customerAbsorption, setCustomerAbsorption] = useState(25);
   const [remainingImpact, setRemainingImpact] = useState(25);
 
-  // Ingredient configurations
   const [showIngredientConfig, setShowIngredientConfig] = useState(false);
   const [expandedIngredient, setExpandedIngredient] = useState(null);
-  const [totalQuantity, setTotalQuantity] = useState(100); // Default 100g total
-  const [ingredientSources, setIngredientSources] = useState({});
+  const [totalQuantity, setTotalQuantity] = useState(100);
+  const [ingredientSources, setIngredientSources] = useState(
+    location.state?.ingredientSources || {}
+  );
+
+  useEffect(() => {
+    if (location.state?.ingredientSources) {
+      setIngredientSources(location.state.ingredientSources);
+    }
+  }, [location.state]);
 
   const ingredients = [
     { id: 1, name: 'Cocoa Butter', percentage: 32.79, details: '' },
@@ -63,8 +63,6 @@ const Dashboard = () => {
     'Food & Beverages': ['Snickers', 'Mars', 'Twix']
   };
 
-  const TARIFF_PERCENTAGE = 5;
-
   const initializeIngredientSources = (ingredientId) => {
     if (!ingredientSources[ingredientId]) {
       setIngredientSources(prev => ({
@@ -80,7 +78,6 @@ const Dashboard = () => {
     }
   };
 
-  // Add, remove, and update ingredient sources
   const addCountrySource = (ingredientId) => {
     const currentSources = ingredientSources[ingredientId] || [];
     const currentTotal = currentSources.reduce((sum, source) => sum + (parseFloat(source.percentage) || 0), 0);
@@ -103,9 +100,21 @@ const Dashboard = () => {
   };
 
   const handleSourceCountryChange = (ingredientId, index, country) => {
-    const newSources = [...ingredientSources[ingredientId]];
-    newSources[index].country = country;
-    setIngredientSources(prev => ({ ...prev, [ingredientId]: newSources }));
+    setIngredientSources(prev => {
+      const updatedSources = [...(prev[ingredientId] || [])];
+      updatedSources[index] = {
+        ...updatedSources[index],
+        country: country,
+        percentage: updatedSources[index?.percentage || 100],
+        supplierAbsorption: updatedSources[index]?.supplierAbsorption || 0,
+        manufacturerAbsorption: updatedSources[index]?.manufacturerAbsorption || 0,
+        cashPaymentDelay: updatedSources[index]?.cashPaymentDelay || 0
+      };
+      return {
+        ...prev,
+        [ingredientId]: updatedSources
+      };
+    });
   };
 
   const handleSourcePercentageChange = (ingredientId, index, percentage) => {
@@ -116,12 +125,43 @@ const Dashboard = () => {
   };
 
   const handleSliderChange = (ingredientId, index, field, value) => {
-    const newSources = [...ingredientSources[ingredientId]];
-    newSources[index][field] = value;
-    setIngredientSources(prev => ({ ...prev, [ingredientId]: newSources }));
+    setIngredientSources(prev => {
+      const updatedSources = [...(prev[ingredientId] || [])];
+      updatedSources[index] = {
+        ...updatedSources[index],
+        [field]: parseInt(value, 10)
+      };
+      return {
+        ...prev,
+        [ingredientId]: updatedSources
+      };
+    });
   };
 
-  // Calculate weight based on ingredient percentage, total quantity, and source percentage
+  useEffect(() => {
+    if (expandedIngredient) {
+      const sources = ingredientSources[expandedIngredient] || [];
+      sources.forEach((source, index) => {
+        if (!source.country) {
+          setIngredientSources(prev => {
+            const updatedSources = [...prev[expandedIngredient]];
+            updatedSources[index] = {
+              ...source,
+              percentage: source.percentage || 100,
+              supplierAbsorption: source.supplierAbsorption || 0,
+              manufacturerAbsorption: source.manufacturerAbsorption || 0,
+              cashPaymentDelay: source.cashPaymentDelay || 0
+            };
+            return {
+              ...prev,
+              [expandedIngredient]: updatedSources
+            };
+          });
+        }
+      });
+    }
+  }, [expandedIngredient, ingredientSources]);
+
   const calculateSourceWeight = (ingredientPercentage, sourcePercentage) => {
     const baseWeight = (ingredientPercentage * totalQuantity / 100);
     const sourceWeight = (baseWeight * (sourcePercentage / 100) * (quantity || 1)).toFixed(2);
@@ -154,13 +194,12 @@ const Dashboard = () => {
     navigate('/dashboard');
   };
 
-  // Calculate tariff impact
   const calculateTariffImpact = () => {
-    const totalCost = quantity * 100; // Assuming a fixed product value of 100 for simplicity
+    const totalCost = quantity * 100;
     const tariffAmount = totalCost * (tariffRate / 100);
     
-    // Calculate absorption amounts based on percentages
-    const supplierAmount = tariffAmount * (supplierAbsorption / 100);
+    // Calculate absorption amounts
+    const supplierAmount = tariffAmount * (supplierAbsorption / 100)
     const manufacturerAmount = tariffAmount * (manufacturerAbsorption / 100);
     const customerAmount = tariffAmount * (customerAbsorption / 100);
     const remainingAmount = tariffAmount * (remainingImpact / 100);
@@ -190,76 +229,6 @@ const Dashboard = () => {
   }, [supplierAbsorption, manufacturerAbsorption, customerAbsorption]);
 
   const results = calculateTariffImpact();
-
-  const costChartData = {
-    labels: ['Without Tariff', 'With Tariff'],
-    datasets: [
-      {
-        label: 'Base Cost',
-        data: [results.withoutTariff, results.withoutTariff],
-        backgroundColor: '#3b82f6'
-      },
-      {
-        label: 'Supplier Absorption',
-        data: [0, results.supplierAmount],
-        backgroundColor: '#f59e0b'
-      },
-      {
-        label: 'Manufacturer Absorption',
-        data: [0, results.manufacturerAmount],
-        backgroundColor: '#10b981'
-      },
-      {
-        label: 'Customer Absorption',
-        data: [0, results.customerAmount],
-        backgroundColor: '#ef4444'
-      },
-      {
-        label: 'Remaining Impact',
-        data: [0, results.remainingAmount],
-        backgroundColor: '#9ca3af'
-      }
-    ]
-  };
-
-  const chartOptions = {
-    plugins: { 
-      legend: { 
-        position: 'bottom',
-        labels: {
-          boxWidth: 12,
-          padding: 20,
-          usePointStyle: true,
-        }
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            return `${context.dataset.label}: $${context.raw.toFixed(2)}`;
-          },
-          afterLabel: function(context) {
-            if (results.tariffAmount === 0) return '';
-            const percentage = ((context.raw / results.tariffAmount) * 100).toFixed(1);
-            return `(${percentage}% of tariff)`;
-          }
-        }
-      }
-    },
-    scales: { 
-      x: { stacked: true },
-      y: { 
-        stacked: true,
-        beginAtZero: true,
-        ticks: {
-          callback: function(value) {
-            return '$' + value;
-          }
-        }
-      } 
-    },
-    responsive: true,
-    maintainAspectRatio: false
-  };
 
   const handleAbsorptionChange = (type, value) => {
     const numValue = Number(value);
@@ -491,20 +460,14 @@ const Dashboard = () => {
               <p>{results.effectiveRate.toFixed(1)}%</p>
             </div>
           </section>
-
-          <section className="tariff-charts">
-            <div className="chart-container">
-              <h3>Tariff Impact Breakdown</h3>
-              <div className="amount-labels">
-                <span>${results.withTariff.toFixed(2)}</span>
-                <span>${results.withoutTariff.toFixed(2)}</span>
-                <span>$0</span>
-              </div>
-              <div className="chart-wrapper">
-                <Bar data={costChartData} options={chartOptions} />
-              </div>
-            </div>
-          </section>
+          
+          <TariffChart 
+            results={results}
+            supplierAbsorption={supplierAbsorption}
+            manufacturerAbsorption={manufacturerAbsorption}
+            customerAbsorption={customerAbsorption}
+            remainingImpact={remainingImpact}
+          />
         </main>
       </div>
     </div>

@@ -245,12 +245,28 @@ const WebPage = () => {
   };
 
   const handleShowResults = () => {
+    // Create a deep copy of ingredientSources with default values
+    const processedSources = {};
+    Object.keys(ingredientSources).forEach(id => {
+      processedSources[id] = ingredientSources[id].map(source => ({
+        country: source.country || '',
+        percentage: source.percentage || 100,
+        supplierAbsorption: parseInt(source.supplierAbsorption || 0),
+        manufacturerAbsorption: parseInt(source.manufacturerAbsorption || 0),
+        cashPaymentDelay: parseInt(source.cashPaymentDelay || 0)
+      }));
+    });
+
     navigate('/results', {
       state: {
-        selectedCountry: selectedCountry,
-        selectedCategory: selectedCategory, 
-        selectedProduct: selectedProduct,
-        selectedQuantity: selectedType
+        selectedCountry,
+        selectedCategory, 
+        selectedProduct,
+        selectedQuantity: selectedType,
+        ingredientSources: processedSources,
+        ingredients,
+        totalQuantity,
+        expandedIngredient
       }
     });
   };
