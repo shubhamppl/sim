@@ -459,33 +459,34 @@ transform: none;
 }
 
 .add-country-btn-container {
-display: flex;
-justify-content: flex-end;
-margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.add-country-btn {
-padding: 10px 20px;
-background-color: #2ecc71;
-color: white;
-border: none;
-border-radius: 6px;
-font-size: 14px;
-font-weight: 500;
-cursor: pointer;
-transition: all 0.2s ease;
-box-shadow: 0 2px 4px rgba(46, 204, 113, 0.2);
+.simulate-btn {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
 }
 
-.add-country-btn:hover {
-background-color: #27ae60;
-transform: translateY(-1px);
-box-shadow: 0 4px 6px rgba(46, 204, 113, 0.3);
+.simulate-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3);
 }
 
-.add-country-btn:active {
-transform: translateY(0);
-box-shadow: 0 2px 4px rgba(46, 204, 113, 0.2);
+.simulate-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
 }
 
 .ingredient-row {

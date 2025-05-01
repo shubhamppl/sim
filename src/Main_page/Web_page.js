@@ -804,11 +804,21 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                           ))}
                         </div>
 
-                        {/* Add Country Button - in a separate div for new line and right alignment */}
+                        {/* Add Country Button container - reordered buttons */}
                         <div className="add-country-btn-container">
                           <button
                             onClick={(e) => {
-                              e.stopPropagation(); // Prevent toggling the ingredient
+                              e.stopPropagation();
+                              // Add your simulation logic here
+                              console.log('Simulating for:', ingredient.name);
+                            }}
+                            className="simulate-btn"
+                          >
+                            Simulate
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
                               addCountrySource(ingredient.name);
                             }}
                             className="add-country-btn"
