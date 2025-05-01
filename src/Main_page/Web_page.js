@@ -10,7 +10,8 @@ const WebPage = () => {
   // Add new state for dynamic countries and categories
   const [countryOptions, setCountryOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
-  const [productOptions, setProductOptions] = useState([]); // Add this line
+  const [productOptions, setProductOptions] = useState([]); 
+  const [sourceCountryOptions, setSourceCountryOptions] = useState([]); // Add new state for source countries
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
@@ -148,6 +149,7 @@ const WebPage = () => {
   useEffect(() => {
     loadCountryOptions();
     loadCategoryOptions();
+    loadSourceCountryOptions(); // Add this line to load source countries
   }, []);
 
   // Update useEffect to reload categories when country changes
@@ -430,7 +432,9 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
   // Get tariff rate for country pair
   const getTariffRate = (fromCountry, toCountry) => {
     const key = `${fromCountry}-${toCountry}`;
-    return tariffData[key] !== undefined ? tariffData[key] : 'N/A';
+    const rate = tariffData[key];
+    console.log(`Getting tariff for ${key}, found: ${rate}`);
+    return rate !== undefined ? rate : 'N/A';
   };
 
   // Add effect to load tariff data when component mounts
@@ -537,6 +541,92 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
   useEffect(() => {
     loadProductOptions();
   }, [selectedCategory, selectedCountry]);
+
+  // Add function to load source countries
+  const loadSourceCountryOptions = async () => {
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const productFiles = files.filter(file => file.fileType === 'product');
+          if (productFiles.length > 0) {
+            const latestFile = productFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            const fromCountryIndex = latestFile.headers.indexOf('From_Country');
+            if (fromCountryIndex !== -1) {
+              const uniqueSourceCountries = [...new Set(latestFile.rows.map(row => row[fromCountryIndex]))].filter(Boolean);
+              setSourceCountryOptions(uniqueSourceCountries.sort());
+            }
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading source countries:', error);
+    }
+  };
+
+  // Load tariff data from product table
+  const loadProductTariffData = async () => {
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const productFiles = files.filter(file => file.fileType === 'product');
+          if (productFiles.length > 0) {
+            const latestFile = productFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            const fromCountryIndex = latestFile.headers.indexOf('From_Country');
+            const toCountryIndex = latestFile.headers.indexOf('To_Country');
+            const tariffPercentIndex = latestFile.headers.indexOf('Current_Tariff_Percent');
+            
+            if (fromCountryIndex !== -1 && toCountryIndex !== -1 && tariffPercentIndex !== -1) {
+              // Create map of country pair to tariff
+              const tariffMap = {};
+              latestFile.rows.forEach(row => {
+                const fromCountry = row[fromCountryIndex];
+                const toCountry = row[toCountryIndex];
+                const tariffPercent = parseFloat(row[tariffPercentIndex]) || 0;
+                
+                if (fromCountry && toCountry) {
+                  const key = `${fromCountry}-${toCountry}`;
+                  tariffMap[key] = tariffPercent;
+                }
+              });
+              
+              setTariffData(tariffMap);
+              console.log("Tariff data loaded:", tariffMap);
+            }
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading product tariff data:', error);
+    }
+  };
+
+  // Replace existing useEffect that loads tariffData with this one
+  useEffect(() => {
+    loadProductTariffData();
+  }, []);
+
+  // Update the effect to reload tariff data when country changes
+  useEffect(() => {
+    if (selectedCountry) {
+      loadProductTariffData();
+    }
+  }, [selectedCountry]);
 
   return (
     <div className="tariff-simulator">
@@ -771,14 +861,14 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                           {ingredientSources[ingredient.name]?.map((source, index) => (
                             // Individual source row - uses flexbox to put items in a line
                             <div key={index} className="ingredient-source-row">
-                              {/* Country Select */}
+                              {/* Country Select - Modified to use sourceCountryOptions */}
                               <select
                                 className="source-select"
                                 value={source.country}
                                 onChange={(e) => handleSourceCountryChange(ingredient.name, index, e.target.value)}
                               >
                                 <option value="">Select Country</option>
-                                {countryOptions.map(country => (
+                                {sourceCountryOptions.map(country => (
                                   <option key={country} value={country}>{country}</option>
                                 ))}
                               </select>
