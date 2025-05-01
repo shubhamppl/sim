@@ -3,7 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import './Web_page.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
+const dbName = "TariffDB";
+const storeName = "files";
+
 const WebPage = () => {
+  // Add new state for dynamic countries and categories
+  const [countryOptions, setCountryOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [productOptions, setProductOptions] = useState([]); // Add this line
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
@@ -37,156 +44,7 @@ const WebPage = () => {
       { country: 'European Union', tariff: 9 },
       { country: 'New Zealand', tariff: 6 },
       { country: 'Madagascar', tariff: 11 }
-    ],
-    'Sugar': [
-      { country: 'USA', tariff: 5 },
-      { country: 'China', tariff: 10 },
-      { country: 'Germany', tariff: 7 },
-      { country: 'India', tariff: 8 },
-      { country: 'Brazil', tariff: 4 },
-      { country: 'European Union', tariff: 6 },
-      { country: 'New Zealand', tariff: 3 },
-      { country: 'Madagascar', tariff: 9 }
-    ],
-    'Milk Powder': [
-      { country: 'USA', tariff: 8 },
-      { country: 'China', tariff: 12 },
-      { country: 'Germany', tariff: 6 },
-      { country: 'India', tariff: 10 },
-      { country: 'Brazil', tariff: 7 },
-      { country: 'European Union', tariff: 5 },
-      { country: 'New Zealand', tariff: 3 },
-      { country: 'Madagascar', tariff: 14 }
-    ],
-    'Vanilla Extract': [
-      { country: 'USA', tariff: 12 },
-      { country: 'China', tariff: 18 },
-      { country: 'Germany', tariff: 9 },
-      { country: 'India', tariff: 15 },
-      { country: 'Brazil', tariff: 11 },
-      { country: 'European Union', tariff: 8 },
-      { country: 'New Zealand', tariff: 7 },
-      { country: 'Madagascar', tariff: 4 }
-    ],
-    'Lecithin': [
-      { country: 'USA', tariff: 4 },
-      { country: 'China', tariff: 9 },
-      { country: 'Germany', tariff: 5 },
-      { country: 'India', tariff: 7 },
-      { country: 'Brazil', tariff: 6 },
-      { country: 'European Union', tariff: 3 },
-      { country: 'New Zealand', tariff: 2 },
-      { country: 'Madagascar', tariff: 8 }
-    ],
-    'Steel': [
-      { country: 'USA', tariff: 5 },
-      { country: 'China', tariff: 25 },
-      { country: 'Germany', tariff: 10 },
-      { country: 'India', tariff: 20 },
-      { country: 'Brazil', tariff: 15 },
-      { country: 'European Union', tariff: 8 },
-      { country: 'New Zealand', tariff: 12 },
-      { country: 'Madagascar', tariff: 18 }
-    ],
-    'Aluminum': [
-      { country: 'USA', tariff: 7 },
-      { country: 'China', tariff: 20 },
-      { country: 'Germany', tariff: 8 },
-      { country: 'India', tariff: 15 },
-      { country: 'Brazil', tariff: 12 },
-      { country: 'European Union', tariff: 6 },
-      { country: 'New Zealand', tariff: 9 },
-      { country: 'Madagascar', tariff: 14 }
-    ],
-    'Rubber': [
-      { country: 'USA', tariff: 8 },
-      { country: 'China', tariff: 15 },
-      { country: 'Germany', tariff: 5 },
-      { country: 'India', tariff: 25 },
-      { country: 'Brazil', tariff: 10 },
-      { country: 'European Union', tariff: 7 },
-      { country: 'New Zealand', tariff: 9 },
-      { country: 'Madagascar', tariff: 12 }
-    ],
-    'Plastic': [
-      { country: 'USA', tariff: 3 },
-      { country: 'China', tariff: 5 },
-      { country: 'Germany', tariff: 4 },
-      { country: 'India', tariff: 10 },
-      { country: 'Brazil', tariff: 7 },
-      { country: 'European Union', tariff: 2 },
-      { country: 'New Zealand', tariff: 6 },
-      { country: 'Madagascar', tariff: 8 }
-    ],
-    'Copper': [
-      { country: 'USA', tariff: 2 },
-      { country: 'China', tariff: 8 },
-      { country: 'Germany', tariff: 3 },
-      { country: 'India', tariff: 7 },
-      { country: 'Brazil', tariff: 5 },
-      { country: 'European Union', tariff: 1 },
-      { country: 'New Zealand', tariff: 4 },
-      { country: 'Madagascar', tariff: 6 }
-    ],
-    'Coffee Beans': [
-      { country: 'USA', tariff: 7 },
-      { country: 'China', tariff: 12 },
-      { country: 'Germany', tariff: 5 },
-      { country: 'India', tariff: 10 },
-      { country: 'Brazil', tariff: 4 },
-      { country: 'European Union', tariff: 6 },
-      { country: 'New Zealand', tariff: 8 },
-      { country: 'Madagascar', tariff: 9 }
-    ],
-    'Tea Leaves': [
-      { country: 'USA', tariff: 8 },
-      { country: 'China', tariff: 10 },
-      { country: 'Germany', tariff: 6 },
-      { country: 'India', tariff: 5 },
-      { country: 'Brazil', tariff: 7 },
-      { country: 'European Union', tariff: 4 },
-      { country: 'New Zealand', tariff: 9 },
-      { country: 'Madagascar', tariff: 11 }
-    ],
-    'Cotton': [
-      { country: 'USA', tariff: 5 },
-      { country: 'China', tariff: 15 },
-      { country: 'Germany', tariff: 8 },
-      { country: 'India', tariff: 10 },
-      { country: 'Brazil', tariff: 7 },
-      { country: 'European Union', tariff: 6 },
-      { country: 'New Zealand', tariff: 9 },
-      { country: 'Madagascar', tariff: 12 }
-    ],
-    'Silk': [
-      { country: 'USA', tariff: 12 },
-      { country: 'China', tariff: 8 },
-      { country: 'Germany', tariff: 10 },
-      { country: 'India', tariff: 7 },
-      { country: 'Brazil', tariff: 9 },
-      { country: 'European Union', tariff: 11 },
-      { country: 'New Zealand', tariff: 13 },
-      { country: 'Madagascar', tariff: 15 }
-    ],
-    'Wool': [
-      { country: 'USA', tariff: 6 },
-      { country: 'China', tariff: 10 },
-      { country: 'Germany', tariff: 8 },
-      { country: 'India', tariff: 12 },
-      { country: 'Brazil', tariff: 9 },
-      { country: 'European Union', tariff: 7 },
-      { country: 'New Zealand', tariff: 5 },
-      { country: 'Madagascar', tariff: 11 }
-    ],
-    'Chemicals': [
-      { country: 'USA', tariff: 4 },
-      { country: 'China', tariff: 8 },
-      { country: 'Germany', tariff: 3 },
-      { country: 'India', tariff: 7 },
-      { country: 'Brazil', tariff: 5 },
-      { country: 'European Union', tariff: 2 },
-      { country: 'New Zealand', tariff: 6 },
-      { country: 'Madagascar', tariff: 9 }
+    
     ]
   };
 
@@ -198,94 +56,6 @@ const WebPage = () => {
         { name: 'Aluminum', percentage: 25 },
         { name: 'Rubber', percentage: 10 },
         { name: 'Plastic', percentage: 5 }
-      ],
-      'Tires': [
-        { name: 'Rubber', percentage: 70 },
-        { name: 'Steel', percentage: 30 }
-      ]
-    },
-    'Electronics': {
-      'Smartphones': [
-        { name: 'Plastic', percentage: 40 },
-        { name: 'Copper', percentage: 30 },
-        { name: 'Aluminum', percentage: 30 }
-      ],
-      'Laptops': [
-        { name: 'Aluminum', percentage: 50 },
-        { name: 'Plastic', percentage: 30 },
-        { name: 'Copper', percentage: 20 }
-      ],
-      'Tablets': [
-        { name: 'Aluminum', percentage: 45 },
-        { name: 'Plastic', percentage: 35 },
-        { name: 'Copper', percentage: 20 }
-      ],
-      'TV Sets': [
-        { name: 'Plastic', percentage: 60 },
-        { name: 'Copper', percentage: 40 }
-      ]
-    },
-    'Food & Beverages': {
-      'Chocolate': [
-        { name: 'Cocoa Butter', percentage: 32.79 },
-        { name: 'Sugar', percentage: 38.26 },
-        { name: 'Milk Powder', percentage: 27.37 },
-        { name: 'Vanilla Extract', percentage: 1.09 },
-        { name: 'Lecithin', percentage: 0.49 }
-      ],
-      'Coffee': [
-        { name: 'Coffee Beans', percentage: 80 },
-        { name: 'Sugar', percentage: 20 }
-      ],
-      'Tea': [
-        { name: 'Tea Leaves', percentage: 85 },
-        { name: 'Sugar', percentage: 15 }
-      ],
-      'Processed Foods': [
-        { name: 'Sugar', percentage: 40 },
-        { name: 'Milk Powder', percentage: 60 }
-      ]
-    },
-    'Textiles': {
-      'Cotton Fabric': [
-        { name: 'Cotton', percentage: 100 }
-      ],
-      'Silk Fabric': [
-        { name: 'Silk', percentage: 100 }
-      ],
-      'Wool Garments': [
-        { name: 'Wool', percentage: 100 }
-      ],
-      'Synthetic Fiber': [
-        { name: 'Plastic', percentage: 100 }
-      ]
-    },
-    'Chemicals': {
-      'Industrial Chemicals': [
-        { name: 'Chemicals', percentage: 100 }
-      ],
-      'Pharmaceuticals': [
-        { name: 'Chemicals', percentage: 100 }
-      ],
-      'Plastics': [
-        { name: 'Plastic', percentage: 100 }
-      ],
-      'Fertilizers': [
-        { name: 'Chemicals', percentage: 100 }
-      ]
-    },
-    'Machinery': {
-      'Industrial Machinery': [
-        { name: 'Steel', percentage: 70 },
-        { name: 'Aluminum', percentage: 30 }
-      ],
-      'Agricultural Equipment': [
-        { name: 'Steel', percentage: 60 },
-        { name: 'Rubber', percentage: 40 }
-      ],
-      'Construction Equipment': [
-        { name: 'Steel', percentage: 80 },
-        { name: 'Rubber', percentage: 20 }
       ]
     }
   };
@@ -327,21 +97,92 @@ const WebPage = () => {
     }
   }, [selectedProduct]);
 
-  // Country options
-  const countryOptions = [
-    'United States',
-    'China',
-    'India',
-    'Brazil',
-    'European Union',
-    'New Zealand',
-    'Madagascar'
-  ];
- 
- 
+  // Add function to fetch unique countries
+  const loadCountryOptions = async () => {
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const productFiles = files.filter(file => file.fileType === 'product');
+          if (productFiles.length > 0) {
+            // Get the latest product file
+            const latestFile = productFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            // Get unique To_Country values from the rows
+            const toCountryIndex = latestFile.headers.indexOf('To_Country');
+            if (toCountryIndex !== -1) {
+              const uniqueCountries = [...new Set(latestFile.rows.map(row => row[toCountryIndex]))].filter(Boolean);
+              setCountryOptions(uniqueCountries.sort());
+            }
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading countries:', error);
+    }
+  };
 
- 
-// Step 2: Dynamically generate a distinct color per label using HSL
+  // Modify loadCategoryOptions to filter by selected country
+  const loadCategoryOptions = async () => {
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const productFiles = files.filter(file => file.fileType === 'product');
+          if (productFiles.length > 0) {
+            const latestFile = productFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            const categoryIndex = latestFile.headers.indexOf('Product_Category');
+            const countryIndex = latestFile.headers.indexOf('To_Country');
+            
+            if (categoryIndex !== -1 && countryIndex !== -1) {
+              // Filter categories based on selected country
+              const uniqueCategories = [...new Set(
+                latestFile.rows
+                  .filter(row => !selectedCountry || row[countryIndex] === selectedCountry)
+                  .map(row => row[categoryIndex])
+              )].filter(Boolean);
+              setCategoryOptions(uniqueCategories.sort());
+            }
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    }
+  };
+
+  // Add useEffect to load countries when component mounts
+  useEffect(() => {
+    loadCountryOptions();
+    loadCategoryOptions();
+  }, []);
+
+  // Update useEffect to reload categories when country changes
+  useEffect(() => {
+    loadCategoryOptions();
+  }, [selectedCountry]);
+
+  // Update country selection handling to use the dynamic list
+  const handleCountryChange = (e) => {
+    setSelectedCountry(e.target.value);
+    setSelectedCategory('');
+    setSelectedProduct('');
+  };
+
+  // Step 2: Dynamically generate a distinct color per label using HSL
 const generateColors = (count) =>
   Array.from({ length: count }, (_, i) => `hsl(${(i * 360) / count}, 70%, 60%)`);
  
@@ -349,26 +190,6 @@ const colors = generateColors(countryOptions.length);
  
 // Step 3: Map each label to a color
 const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, colors[i]]));
-
-  // Category options
-  const categoryOptions = [
-    'Electronics',
-    'Textiles',
-    'Automotive',
-    'Food & Beverages',
-    'Chemicals',
-    'Machinery'
-  ];
-
-  // Product options by category
-  const productOptions = {
-    'Electronics': ['Smartphones', 'Laptops', 'Tablets', 'TV Sets'],
-    'Textiles': ['Cotton Fabric', 'Silk Fabric', 'Wool Garments', 'Synthetic Fiber'],
-    'Automotive': ['Cars', 'Tires'],
-    'Food & Beverages': ['Chocolate', 'Coffee', 'Tea', 'Processed Foods'],
-    'Chemicals': ['Industrial Chemicals', 'Pharmaceuticals', 'Plastics', 'Fertilizers'],
-    'Machinery': ['Industrial Machinery', 'Agricultural Equipment', 'Construction Equipment']
-  };
 
   // Initialize ingredient sources when expanded
   const initializeIngredientSources = (ingredientId) => {
@@ -536,6 +357,86 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
     });
   };
 
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({ headers: [], rows: [], title: '' });
+
+  const loadTableData = async (fileType) => {
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const latestFile = files
+            .filter(file => file.fileType === fileType)
+            .sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+          
+          if (latestFile) {
+            setModalData({
+              headers: latestFile.headers,
+              rows: latestFile.rows,
+              title: fileType === 'supplyChain' ? 'Supply Chain Data' : 'Product Data'
+            });
+            setIsTableModalOpen(true);
+          } else {
+            alert('No data available. Please upload a file first.');
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading data:', error);
+      alert('Error loading data. Please try again.');
+    }
+  };
+
+  // Add function to load products based on selected category and country
+  const loadProductOptions = async () => {
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const productFiles = files.filter(file => file.fileType === 'product');
+          if (productFiles.length > 0) {
+            const latestFile = productFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            const productIndex = latestFile.headers.indexOf('Product_Sub_Category');
+            const categoryIndex = latestFile.headers.indexOf('Product_Category');
+            const countryIndex = latestFile.headers.indexOf('To_Country');
+            
+            if (productIndex !== -1 && categoryIndex !== -1 && countryIndex !== -1) {
+              const uniqueProducts = [...new Set(
+                latestFile.rows
+                  .filter(row => 
+                    (!selectedCountry || row[countryIndex] === selectedCountry) &&
+                    (!selectedCategory || row[categoryIndex] === selectedCategory)
+                  )
+                  .map(row => row[productIndex])
+              )].filter(Boolean);
+              setProductOptions(uniqueProducts.sort());
+            }
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading products:', error);
+    }
+  };
+
+  // Add useEffect to reload products when category or country changes
+  useEffect(() => {
+    loadProductOptions();
+  }, [selectedCategory, selectedCountry]);
+
   return (
     <div className="tariff-simulator">
       <div className="header">
@@ -569,15 +470,66 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
         </div>
       </div>
 
-      <div className="filter-info">
-        Configure your tariff analysis parameters:
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingRight: '20px' }}>
+        <div className="filter-info">
+          Configure your tariff analysis parameters:
+        </div>
+        <div style={{ display: 'flex', gap: '10px', position: 'relative', right: '20px', marginTop: '15px' }}>
+          <button 
+            className="view-table-btn" 
+            onClick={() => loadTableData('product')}
+          >
+            View Product Table
+          </button>
+          <button 
+            className="view-table-btn" 
+            onClick={() => loadTableData('supplyChain')}
+          >
+            View Supply Table
+          </button>
+        </div>
       </div>
+
+      {/* Add modal component */}
+      {isTableModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>{modalData.title}</h2>
+              <button className="close-modal" onClick={() => setIsTableModalOpen(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div className="table-container">
+                <table className="preview-table">
+                  <thead>
+                    <tr>
+                      {modalData.headers.map((header, index) => (
+                        <th key={index}>{header}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {modalData.rows.map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {row.map((cell, cellIndex) => (
+                          <td key={cellIndex}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="search-bar">
         <div className="search-item">
           <input
             type="text"
             value={selectedCountry}
-            onChange={(e) => setSelectedCountry(e.target.value)}
+            onChange={handleCountryChange}
             className="search-input"
             placeholder="Enter/Select Country"
             list="countries"
@@ -610,7 +562,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
             disabled={!selectedCategory}
           >
             <option value="">Select Product</option>
-            {selectedCategory && productOptions[selectedCategory]?.map((product) => (
+            {productOptions.map((product) => (
               <option key={product} value={product}>{product}</option>
             ))}
           </select>

@@ -1,0 +1,48 @@
+HS_Code,To_Country,From_Country,Product_Category,Product_Sub_Category,Raw_Material_Name,Base_Price_Per_Unit,payment_term_days,Current_Tariff_Percent,Future_Tariff_Percent,Import_Percent,Product_percent_requied,Find_per_kg
+402,United States of America,India,Food & Beverages,Snickers,Milk Powder,454.61,60,10,20,50,20,0.01
+402,United States of America,Malaysia,Food & Beverages,Snickers,Milk Powder,492.48,30,12,15,50,20,0.01
+1507,United States of America,Australia,Food & Beverages,Snickers,Lecithin,488.01,30,15,20,100,30,0.01
+1806,United States of America,Germany,Food & Beverages,Snickers,Cocoa Butter,556.84,60,10,20,50,20,0.01
+1806,United States of America,Indonesia,Food & Beverages,Snickers,Cocoa Butter,588.04,30,20,15,50,20,0.01
+2008,United States of America,Mexico,Food & Beverages,Snickers,Vanilla Extract,435.44,60,25,15,100,20,0.01
+1112,United States of America,India,Food & Beverages,Snickers,Sugar,790.4,30,10,15,100,10,0.01
+1112,China,India,Technology,Snickers,Sugar,790.4,30,10,15,100,10,0.01
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,100,10

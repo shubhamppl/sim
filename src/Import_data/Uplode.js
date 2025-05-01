@@ -31,6 +31,9 @@ const Upload = () => {
   const [savedFiles, setSavedFiles] = useState([]);
   const [previewFile, setPreviewFile] = useState(null);
   const [previewType, setPreviewType] = useState('');
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [productFile, setProductFile] = useState(null);
+  const [fileType, setFileType] = useState(''); // 'supply' or 'product'
 
   useEffect(() => {
     loadSavedFiles();
@@ -47,13 +50,14 @@ const Upload = () => {
         setSavedFiles(request.result);
       };
     } catch (error) {
-      console.error('Error loading files:', error);
+      setUploadStatus('Error loading files: ' + error.message);
     }
   };
-
-  const handleFileChange = (e) => {
+ 
+  const handleFileChange = (e, type) => {
     const selectedFile = e.target.files[0];
-    setSupplyChainFile(selectedFile);
+    type === 'supply' ? setSupplyChainFile(selectedFile) : setProductFile(selectedFile);
+    setFileType(type);
     setPreviewType('upload');
     
     if (selectedFile) {
@@ -106,17 +110,18 @@ const Upload = () => {
   };
 
   const handleUpload = async () => {
-    if (supplyChainFile) {
+    const fileToUpload = fileType === 'supply' ? supplyChainFile : productFile;
+    if (fileToUpload) {
       try {
         const db = await initDB();
-        const newFileId = `00${savedFiles.length + 1}`.slice(-3);
+        const newFileId = `${fileType === 'supply' ? 'S' : 'P'}${savedFiles.length + 1}`.padStart(3, '0');
         
         const fileData = {
           id: newFileId,
           headers: headers,
           rows: rows,
-          fileName: supplyChainFile.name,
-          fileType: 'supplyChain',
+          fileName: fileToUpload.name,
+          fileType: fileType === 'supply' ? 'supplyChain' : 'product',
           uploadDate: new Date().toISOString()
         };
 
@@ -127,7 +132,7 @@ const Upload = () => {
         setUploadStatus(`File uploaded successfully! Saved with ID: ${newFileId}`);
         await loadSavedFiles();
         
-        setSupplyChainFile(null);
+        fileType === 'supply' ? setSupplyChainFile(null) : setProductFile(null);
         setHeaders([]);
         setRows([]);
       } catch (error) {
@@ -162,6 +167,7 @@ const Upload = () => {
         setHeaders(request.result.headers);
         setRows(request.result.rows);
         setPreviewType('saved');
+        setIsPreviewModalOpen(true);
       };
     } catch (error) {
       setUploadStatus('Error loading preview: ' + error.message);
@@ -177,6 +183,11 @@ const Upload = () => {
     }
   };
 
+  const closePreviewModal = () => {
+    setIsPreviewModalOpen(false);
+    clearPreview();
+  };
+
   const handleBack = () => {
     navigate('/dashboard');
   };
@@ -190,7 +201,7 @@ const Upload = () => {
       
       <div className="upload-container">
         <div className="upload-content">
-          <div className="upload-title">Upload Supply Chain Data</div>
+          <div className="upload-title">Upload Data</div>
           
           <div className="upload-grid">
             <div className="info-section">
@@ -205,31 +216,45 @@ const Upload = () => {
               </section>
             </div>
 
+            <div className="info-section">
+              <section className="about-section">
+                <div className="section-title">About Product Data Upload</div>
+                <div className="section-content">
+                  <p>
+                    Upload product data files containing details about your products, pricing, 
+                    and specifications. The simulator accepts CSV and Excel files for product analysis.
+                  </p>
+                </div>
+              </section>
+            </div>
+
             <div className="templates-section">
-              <div className="section-title">Sample Template</div>
+              <div className="section-title">Sample Templates</div>
               <div className="section-content">
-                <p>Download the sample template to see the expected format:</p>
+                <p>Download the sample templates to see the expected format:</p>
                 <ul className="template-list">
                   <li><a href="#">Supply Chain Template</a></li>
+                  <li><a href="#">Product Data Template</a></li>
                 </ul>
               </div>
             </div>
 
+            {/* Supply Chain Upload Section */}
             <div className="file-upload-container">
               <section className="file-upload-section">
                 <div className="section-title">Supply Chain Data</div>
                 <div 
                   className="file-drop-zone"
-                  onDrop={handleDrop}
+                  onDrop={(e) => { e.preventDefault(); handleFileChange({ target: { files: [e.dataTransfer.files[0]] } }, 'supply'); }}
                   onDragOver={preventDefault}
                   onDragEnter={preventDefault}
                 >
-                  <h3 className="drop-zone-title">Drag and Drop or Select File</h3>
+                  <h3 className="drop-zone-title">Drag and Drop or Select Supply Chain File</h3>
                   <p className="file-requirements">CSV or Excel files only</p>
                   <input 
                     type="file" 
                     accept=".csv,.xlsx,.xls"
-                    onChange={handleFileChange}
+                    onChange={(e) => handleFileChange(e, 'supply')}
                     className="file-input"
                     id="supplyChainInput"
                   />
@@ -240,18 +265,53 @@ const Upload = () => {
                     <p className="file-info">Selected: {supplyChainFile.name}</p>
                   )}
                 </div>
+                <button 
+                  className="upload-submit-btn" 
+                  onClick={() => { setFileType('supply'); handleUpload(); }}
+                  disabled={!supplyChainFile}
+                >
+                  Upload Supply Chain File
+                </button>
+              </section>
+            </div>
+
+            {/* Product Data Upload Section */}
+            <div className="file-upload-container">
+              <section className="file-upload-section">
+                <div className="section-title">Product Data</div>
+                <div 
+                  className="file-drop-zone"
+                  onDrop={(e) => { e.preventDefault(); handleFileChange({ target: { files: [e.dataTransfer.files[0]] } }, 'product'); }}
+                  onDragOver={preventDefault}
+                  onDragEnter={preventDefault}
+                >
+                  <h3 className="drop-zone-title">Drag and Drop or Select Product File</h3>
+                  <p className="file-requirements">CSV or Excel files only</p>
+                  <input 
+                    type="file" 
+                    accept=".csv,.xlsx,.xls"
+                    onChange={(e) => handleFileChange(e, 'product')}
+                    className="file-input"
+                    id="productInput"
+                  />
+                  <label htmlFor="productInput" className="file-select-button">
+                    Select File
+                  </label>
+                  {productFile && (
+                    <p className="file-info">Selected: {productFile.name}</p>
+                  )}
+                </div>
+                <button 
+                  className="upload-submit-btn" 
+                  onClick={() => { setFileType('product'); handleUpload(); }}
+                  disabled={!productFile}
+                >
+                  Upload Product File
+                </button>
               </section>
             </div>
 
             <div className="action-section">
-              <button 
-                className="upload-submit-btn" 
-                onClick={handleUpload}
-                disabled={!supplyChainFile}
-              >
-                Upload File
-              </button>
-              
               {uploadStatus && (
                 <div className={`upload-status ${uploadStatus.includes('Error') ? 'error' : 'success'}`}>
                   {uploadStatus}
@@ -259,68 +319,63 @@ const Upload = () => {
               )}
             </div>
 
-            <div className="preview-section">
-              <div className='section-title'>Data Preview</div>
-              <div className="section-content">
-                {headers.length === 0 && <p>Select a file to preview...</p>}
-              </div>
-              {headers.length > 0 && (
-                <div className="table-container">
-                  <table className="preview-table">
-                    <thead>
-                      <tr>
-                        {headers.map((header, index) => (
-                          <th key={index} className="preview-header">
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((row, rowIndex) => (
-                        <tr key={rowIndex} className="preview-row">
-                          {row.map((cell, cellIndex) => (
-                            <td key={cellIndex} className="preview-cell">
-                              {cell}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            <div className="sample-data-section">
-              <div className='section-title'>Sample Data Available</div>
-              <div className="section-content">
-                <p>You can use the following sample data file from the data folder:</p>
-                <ul className="sample-data-list">
-                  <li>Supply Chain: DataCo Smart Supply Chain Dataset.zip</li>
-                </ul>
-              </div>
-            </div>
-
+            {/* Saved Files Sections */}
             <div className="saved-files-section">
-              <div className='section-title'>Saved Files ({savedFiles.length})</div>
+              <div className='section-title'>Saved Supply Chain Files</div>
               <div className="saved-files-list">
                 <table className="saved-files-table">
                   <thead>
                     <tr>
                       <th>ID</th>
                       <th>File Name</th>
-                      <th>Type</th>
                       <th>Upload Date</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {savedFiles.map((savedFile) => (
+                    {savedFiles.filter(file => file.fileType === 'supplyChain').map((savedFile) => (
                       <tr key={savedFile.id}>
                         <td>{savedFile.id}</td>
                         <td>{savedFile.fileName}</td>
-                        <td>{savedFile.fileType || 'N/A'}</td>
+                        <td>{new Date(savedFile.uploadDate).toLocaleDateString()}</td>
+                        <td className="action-buttons">
+                          <button 
+                            className="preview-btn"
+                            onClick={() => handlePreview(savedFile.id)}
+                          >
+                            Preview
+                          </button>
+                          <button 
+                            className="delete-btn"
+                            onClick={() => handleDelete(savedFile.id)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="saved-files-section">
+              <div className='section-title'>Saved Product Files</div>
+              <div className="saved-files-list">
+                <table className="saved-files-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>File Name</th>
+                      <th>Upload Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {savedFiles.filter(file => file.fileType === 'product').map((savedFile) => (
+                      <tr key={savedFile.id}>
+                        <td>{savedFile.id}</td>
+                        <td>{savedFile.fileName}</td>
                         <td>{new Date(savedFile.uploadDate).toLocaleDateString()}</td>
                         <td className="action-buttons">
                           <button 
@@ -345,6 +400,47 @@ const Upload = () => {
           </div>
         </div>
       </div>
+
+      {isPreviewModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Data Preview</h2>
+              <button className="close-modal" onClick={closePreviewModal}>&times;</button>
+            </div>
+            <div className="modal-body">
+              {headers.length > 0 ? (
+                <div className="table-container">
+                  <table className="preview-table">
+                    <thead>
+                      <tr>
+                        {headers.map((header, index) => (
+                          <th key={index} className="preview-header">
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((row, rowIndex) => (
+                        <tr key={rowIndex} className="preview-row">
+                          {row.map((cell, cellIndex) => (
+                            <td key={cellIndex} className="preview-cell">
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>No data to preview</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
