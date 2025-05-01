@@ -1,37 +1,187 @@
-Base_Price_Per_Unit,Tariffs,Raw_Material_Name,Export_Country,Import_country,contract_end_date
-450,20,Vanilla Extract,India,United States of America,2025-05-01 00:00:00
-450,30,Vanilla Extract,India,United States of America,2025-06-02 00:00:00
-450,15,Vanilla Extract,India,United States of America,2025-07-03 00:00:00
-450,25,Vanilla Extract,India,United States of America,2025-08-05 00:00:00
-450,20,Vanilla Extract,India,United States of America,2025-09-07 00:00:00
-450,15,Vanilla Extract,India,United States of America,2025-10-11 00:00:00
-790.4,10,Vanilla Extract,Malaysia,United States of America,2025-05-01 00:00:00
-790.4,12,Vanilla Extract,Malaysia,United States of America,2025-06-02 00:00:00
-790.4,20,Vanilla Extract,Malaysia,United States of America,2025-07-03 00:00:00
-790.4,11,Vanilla Extract,Malaysia,United States of America,2025-08-05 00:00:00
-790.4,11,Vanilla Extract,Malaysia,United States of America,2025-09-07 00:00:00
-790.4,15,Vanilla Extract,Malaysia,United States of America,2025-10-11 00:00:00
-450,23,Vanilla Extract,Australia,United States of America,2025-05-01 00:00:00
-450,30,Vanilla Extract,Australia,United States of America,2025-06-02 00:00:00
-450,24,Vanilla Extract,Australia,United States of America,2025-07-03 00:00:00
-450,30,Vanilla Extract,Australia,United States of America,2025-08-05 00:00:00
-450,26,Vanilla Extract,Australia,United States of America,2025-09-07 00:00:00
-450,14,Vanilla Extract,Australia,United States of America,2025-10-11 00:00:00
-450,15,Vanilla Extract,Germany,United States of America,2025-05-01 00:00:00
-450,12,Vanilla Extract,Germany,United States of America,2025-06-02 00:00:00
-450,18,Vanilla Extract,Germany,United States of America,2025-07-03 00:00:00
-450,12,Vanilla Extract,Germany,United States of America,2025-08-05 00:00:00
-450,21,Vanilla Extract,Germany,United States of America,2025-09-07 00:00:00
-450,17,Vanilla Extract,Germany,United States of America,2025-10-11 00:00:00
-560,21,Vanilla Extract,Indonesia,United States of America,2025-05-01 00:00:00
-560,21,Vanilla Extract,Indonesia,United States of America,2025-06-02 00:00:00
-560,30,Vanilla Extract,Indonesia,United States of America,2025-07-03 00:00:00
-560,28,Vanilla Extract,Indonesia,United States of America,2025-08-05 00:00:00
-560,12,Vanilla Extract,Indonesia,United States of America,2025-09-07 00:00:00
-560,12,Vanilla Extract,Indonesia,United States of America,2025-10-11 00:00:00
-435.44,19,Vanilla Extract,Mexico,United States of America,2025-05-01 00:00:00
-435.44,10,Vanilla Extract,Mexico,United States of America,2025-06-02 00:00:00
-435.44,11,Vanilla Extract,Mexico,United States of America,2025-07-03 00:00:00
-435.44,27,Vanilla Extract,Mexico,United States of America,2025-08-05 00:00:00
-435.44,29,Vanilla Extract,Mexico,United States of America,2025-09-07 00:00:00
-435.44,30,Vanilla Extract,Mexico,United States of America,2025-10-11 00:00:00
+Base_Price_Per_Unit,Tariffs,Raw_Material_Name,Export_Country,Import_country,contract_end_date,Product_Sub_Category
+790.4,20,Sugar,India,United States of America,2025-05-01 00:00:00,Snickers
+790.4,30,Sugar,India,United States of America,2025-06-02 00:00:00,Snickers
+790.4,20,Sugar,India,United States of America,2025-07-03 00:00:00,Snickers
+790.4,20,Sugar,India,United States of America,2025-08-05 00:00:00,Snickers
+790.4,15,Sugar,India,United States of America,2025-09-07 00:00:00,Snickers
+790.4,20,Sugar,India,United States of America,2025-10-11 00:00:00,Snickers
+454.61,15,Milk Powder,India,United States of America,2025-05-01 00:00:00,Snickers
+454.61,20,Milk Powder,India,United States of America,2025-06-02 00:00:00,Snickers
+454.61,30,Milk Powder,India,United States of America,2025-07-03 00:00:00,Snickers
+454.61,20,Milk Powder,India,United States of America,2025-08-05 00:00:00,Snickers
+454.61,15,Milk Powder,India,United States of America,2025-09-07 00:00:00,Snickers
+454.61,25,Milk Powder,India,United States of America,2025-10-11 00:00:00,Snickers
+460,20,Lecithin,India,United States of America,2025-05-01 00:00:00,Snickers
+460,15,Lecithin,India,United States of America,2025-06-02 00:00:00,Snickers
+460,20,Lecithin,India,United States of America,2025-07-03 00:00:00,Snickers
+460,15,Lecithin,India,United States of America,2025-08-05 00:00:00,Snickers
+460,20,Lecithin,India,United States of America,2025-09-07 00:00:00,Snickers
+460,30,Lecithin,India,United States of America,2025-10-11 00:00:00,Snickers
+560,15,Cocoa Butter,India,United States of America,2025-05-01 00:00:00,Snickers
+560,25,Cocoa Butter,India,United States of America,2025-06-02 00:00:00,Snickers
+560,20,Cocoa Butter,India,United States of America,2025-07-03 00:00:00,Snickers
+560,15,Cocoa Butter,India,United States of America,2025-08-05 00:00:00,Snickers
+560,20,Cocoa Butter,India,United States of America,2025-09-07 00:00:00,Snickers
+560,15,Cocoa Butter,India,United States of America,2025-10-11 00:00:00,Snickers
+450,20,Vanilla Extract,India,United States of America,2025-05-01 00:00:00,Snickers
+450,30,Vanilla Extract,India,United States of America,2025-06-02 00:00:00,Snickers
+450,15,Vanilla Extract,India,United States of America,2025-07-03 00:00:00,Snickers
+450,25,Vanilla Extract,India,United States of America,2025-08-05 00:00:00,Snickers
+450,20,Vanilla Extract,India,United States of America,2025-09-07 00:00:00,Snickers
+450,15,Vanilla Extract,India,United States of America,2025-10-11 00:00:00,Snickers
+780,19,Sugar,Malaysia,United States of America,2025-05-01 00:00:00,Snickers
+780,25,Sugar,Malaysia,United States of America,2025-06-02 00:00:00,Snickers
+780,27,Sugar,Malaysia,United States of America,2025-07-03 00:00:00,Snickers
+780,23,Sugar,Malaysia,United States of America,2025-08-05 00:00:00,Snickers
+780,25,Sugar,Malaysia,United States of America,2025-09-07 00:00:00,Snickers
+780,22,Sugar,Malaysia,United States of America,2025-10-11 00:00:00,Snickers
+492.48,17,Milk Powder,Malaysia,United States of America,2025-05-01 00:00:00,Snickers
+492.48,23,Milk Powder,Malaysia,United States of America,2025-06-02 00:00:00,Snickers
+492.48,21,Milk Powder,Malaysia,United States of America,2025-07-03 00:00:00,Snickers
+492.48,14,Milk Powder,Malaysia,United States of America,2025-08-05 00:00:00,Snickers
+492.48,22,Milk Powder,Malaysia,United States of America,2025-09-07 00:00:00,Snickers
+492.48,24,Milk Powder,Malaysia,United States of America,2025-10-11 00:00:00,Snickers
+450,19,Lecithin,Malaysia,United States of America,2025-05-01 00:00:00,Snickers
+450,28,Lecithin,Malaysia,United States of America,2025-06-02 00:00:00,Snickers
+450,19,Lecithin,Malaysia,United States of America,2025-07-03 00:00:00,Snickers
+450,30,Lecithin,Malaysia,United States of America,2025-08-05 00:00:00,Snickers
+450,21,Lecithin,Malaysia,United States of America,2025-09-07 00:00:00,Snickers
+450,12,Lecithin,Malaysia,United States of America,2025-10-11 00:00:00,Snickers
+540,29,Cocoa Butter,Malaysia,United States of America,2025-05-01 00:00:00,Snickers
+540,30,Cocoa Butter,Malaysia,United States of America,2025-06-02 00:00:00,Snickers
+540,18,Cocoa Butter,Malaysia,United States of America,2025-07-03 00:00:00,Snickers
+540,30,Cocoa Butter,Malaysia,United States of America,2025-08-05 00:00:00,Snickers
+540,10,Cocoa Butter,Malaysia,United States of America,2025-09-07 00:00:00,Snickers
+540,30,Cocoa Butter,Malaysia,United States of America,2025-10-11 00:00:00,Snickers
+790.4,10,Vanilla Extract,Malaysia,United States of America,2025-05-01 00:00:00,Snickers
+790.4,12,Vanilla Extract,Malaysia,United States of America,2025-06-02 00:00:00,Snickers
+790.4,20,Vanilla Extract,Malaysia,United States of America,2025-07-03 00:00:00,Snickers
+790.4,11,Vanilla Extract,Malaysia,United States of America,2025-08-05 00:00:00,Snickers
+790.4,11,Vanilla Extract,Malaysia,United States of America,2025-09-07 00:00:00,Snickers
+790.4,15,Vanilla Extract,Malaysia,United States of America,2025-10-11 00:00:00,Snickers
+750,27,Sugar,Australia,United States of America,2025-05-01 00:00:00,Snickers
+750,15,Sugar,Australia,United States of America,2025-06-02 00:00:00,Snickers
+750,15,Sugar,Australia,United States of America,2025-07-03 00:00:00,Snickers
+750,25,Sugar,Australia,United States of America,2025-08-05 00:00:00,Snickers
+750,17,Sugar,Australia,United States of America,2025-09-07 00:00:00,Snickers
+750,27,Sugar,Australia,United States of America,2025-10-11 00:00:00,Snickers
+470,16,Milk Powder,Australia,United States of America,2025-05-01 00:00:00,Snickers
+470,16,Milk Powder,Australia,United States of America,2025-06-02 00:00:00,Snickers
+470,16,Milk Powder,Australia,United States of America,2025-07-03 00:00:00,Snickers
+470,23,Milk Powder,Australia,United States of America,2025-08-05 00:00:00,Snickers
+470,22,Milk Powder,Australia,United States of America,2025-09-07 00:00:00,Snickers
+470,17,Milk Powder,Australia,United States of America,2025-10-11 00:00:00,Snickers
+488.01,14,Lecithin,Australia,United States of America,2025-05-01 00:00:00,Snickers
+488.01,12,Lecithin,Australia,United States of America,2025-06-02 00:00:00,Snickers
+488.01,22,Lecithin,Australia,United States of America,2025-07-03 00:00:00,Snickers
+488.01,21,Lecithin,Australia,United States of America,2025-08-05 00:00:00,Snickers
+488.01,23,Lecithin,Australia,United States of America,2025-09-07 00:00:00,Snickers
+488.01,24,Lecithin,Australia,United States of America,2025-10-11 00:00:00,Snickers
+550,10,Cocoa Butter,Australia,United States of America,2025-05-01 00:00:00,Snickers
+550,13,Cocoa Butter,Australia,United States of America,2025-06-02 00:00:00,Snickers
+550,25,Cocoa Butter,Australia,United States of America,2025-07-03 00:00:00,Snickers
+550,13,Cocoa Butter,Australia,United States of America,2025-08-05 00:00:00,Snickers
+550,21,Cocoa Butter,Australia,United States of America,2025-09-07 00:00:00,Snickers
+550,22,Cocoa Butter,Australia,United States of America,2025-10-11 00:00:00,Snickers
+450,23,Vanilla Extract,Australia,United States of America,2025-05-01 00:00:00,Snickers
+450,30,Vanilla Extract,Australia,United States of America,2025-06-02 00:00:00,Snickers
+450,24,Vanilla Extract,Australia,United States of America,2025-07-03 00:00:00,Snickers
+450,30,Vanilla Extract,Australia,United States of America,2025-08-05 00:00:00,Snickers
+450,26,Vanilla Extract,Australia,United States of America,2025-09-07 00:00:00,Snickers
+450,14,Vanilla Extract,Australia,United States of America,2025-10-11 00:00:00,Snickers
+720,27,Sugar,Germany,United States of America,2025-05-01 00:00:00,Snickers
+720,28,Sugar,Germany,United States of America,2025-06-02 00:00:00,Snickers
+720,16,Sugar,Germany,United States of America,2025-07-03 00:00:00,Snickers
+720,22,Sugar,Germany,United States of America,2025-08-05 00:00:00,Snickers
+720,14,Sugar,Germany,United States of America,2025-09-07 00:00:00,Snickers
+720,20,Sugar,Germany,United States of America,2025-10-11 00:00:00,Snickers
+480,19,Milk Powder,Germany,United States of America,2025-05-01 00:00:00,Snickers
+480,15,Milk Powder,Germany,United States of America,2025-06-02 00:00:00,Snickers
+480,19,Milk Powder,Germany,United States of America,2025-07-03 00:00:00,Snickers
+480,17,Milk Powder,Germany,United States of America,2025-08-05 00:00:00,Snickers
+480,21,Milk Powder,Germany,United States of America,2025-09-07 00:00:00,Snickers
+480,18,Milk Powder,Germany,United States of America,2025-10-11 00:00:00,Snickers
+440,26,Lecithin,Germany,United States of America,2025-05-01 00:00:00,Snickers
+440,16,Lecithin,Germany,United States of America,2025-06-02 00:00:00,Snickers
+440,23,Lecithin,Germany,United States of America,2025-07-03 00:00:00,Snickers
+440,17,Lecithin,Germany,United States of America,2025-08-05 00:00:00,Snickers
+440,29,Lecithin,Germany,United States of America,2025-09-07 00:00:00,Snickers
+440,12,Lecithin,Germany,United States of America,2025-10-11 00:00:00,Snickers
+556.84,30,Cocoa Butter,Germany,United States of America,2025-05-01 00:00:00,Snickers
+556.84,22,Cocoa Butter,Germany,United States of America,2025-06-02 00:00:00,Snickers
+556.84,21,Cocoa Butter,Germany,United States of America,2025-07-03 00:00:00,Snickers
+556.84,27,Cocoa Butter,Germany,United States of America,2025-08-05 00:00:00,Snickers
+556.84,10,Cocoa Butter,Germany,United States of America,2025-09-07 00:00:00,Snickers
+556.84,29,Cocoa Butter,Germany,United States of America,2025-10-11 00:00:00,Snickers
+450,15,Vanilla Extract,Germany,United States of America,2025-05-01 00:00:00,Snickers
+450,12,Vanilla Extract,Germany,United States of America,2025-06-02 00:00:00,Snickers
+450,18,Vanilla Extract,Germany,United States of America,2025-07-03 00:00:00,Snickers
+450,12,Vanilla Extract,Germany,United States of America,2025-08-05 00:00:00,Snickers
+450,21,Vanilla Extract,Germany,United States of America,2025-09-07 00:00:00,Snickers
+450,17,Vanilla Extract,Germany,United States of America,2025-10-11 00:00:00,Snickers
+700,16,Sugar,Indonesia,United States of America,2025-05-01 00:00:00,Snickers
+700,30,Sugar,Indonesia,United States of America,2025-06-02 00:00:00,Snickers
+700,28,Sugar,Indonesia,United States of America,2025-07-03 00:00:00,Snickers
+700,23,Sugar,Indonesia,United States of America,2025-08-05 00:00:00,Snickers
+700,17,Sugar,Indonesia,United States of America,2025-09-07 00:00:00,Snickers
+700,16,Sugar,Indonesia,United States of America,2025-10-11 00:00:00,Snickers
+455,27,Milk Powder,Indonesia,United States of America,2025-05-01 00:00:00,Snickers
+455,29,Milk Powder,Indonesia,United States of America,2025-06-02 00:00:00,Snickers
+455,20,Milk Powder,Indonesia,United States of America,2025-07-03 00:00:00,Snickers
+455,26,Milk Powder,Indonesia,United States of America,2025-08-05 00:00:00,Snickers
+455,26,Milk Powder,Indonesia,United States of America,2025-09-07 00:00:00,Snickers
+455,28,Milk Powder,Indonesia,United States of America,2025-10-11 00:00:00,Snickers
+455,25,Lecithin,Indonesia,United States of America,2025-05-01 00:00:00,Snickers
+455,21,Lecithin,Indonesia,United States of America,2025-06-02 00:00:00,Snickers
+455,18,Lecithin,Indonesia,United States of America,2025-07-03 00:00:00,Snickers
+455,17,Lecithin,Indonesia,United States of America,2025-08-05 00:00:00,Snickers
+455,14,Lecithin,Indonesia,United States of America,2025-09-07 00:00:00,Snickers
+455,15,Lecithin,Indonesia,United States of America,2025-10-11 00:00:00,Snickers
+588.04,24,Cocoa Butter,Indonesia,United States of America,2025-05-01 00:00:00,Snickers
+588.04,14,Cocoa Butter,Indonesia,United States of America,2025-06-02 00:00:00,Snickers
+588.04,25,Cocoa Butter,Indonesia,United States of America,2025-07-03 00:00:00,Snickers
+588.04,27,Cocoa Butter,Indonesia,United States of America,2025-08-05 00:00:00,Snickers
+588.04,18,Cocoa Butter,Indonesia,United States of America,2025-09-07 00:00:00,Snickers
+588.04,24,Cocoa Butter,Indonesia,United States of America,2025-10-11 00:00:00,Snickers
+560,21,Vanilla Extract,Indonesia,United States of America,2025-05-01 00:00:00,Snickers
+560,21,Vanilla Extract,Indonesia,United States of America,2025-06-02 00:00:00,Snickers
+560,30,Vanilla Extract,Indonesia,United States of America,2025-07-03 00:00:00,Snickers
+560,28,Vanilla Extract,Indonesia,United States of America,2025-08-05 00:00:00,Snickers
+560,12,Vanilla Extract,Indonesia,United States of America,2025-09-07 00:00:00,Snickers
+560,12,Vanilla Extract,Indonesia,United States of America,2025-10-11 00:00:00,Snickers
+800,11,Sugar,Mexico,United States of America,2025-05-01 00:00:00,Snickers
+800,26,Sugar,Mexico,United States of America,2025-06-02 00:00:00,Snickers
+800,15,Sugar,Mexico,United States of America,2025-07-03 00:00:00,Snickers
+800,15,Sugar,Mexico,United States of America,2025-08-05 00:00:00,Snickers
+800,20,Sugar,Mexico,United States of America,2025-09-07 00:00:00,Snickers
+800,23,Sugar,Mexico,United States of America,2025-10-11 00:00:00,Snickers
+460,26,Milk Powder,Mexico,United States of America,2025-05-01 00:00:00,Snickers
+460,16,Milk Powder,Mexico,United States of America,2025-06-02 00:00:00,Snickers
+460,17,Milk Powder,Mexico,United States of America,2025-07-03 00:00:00,Snickers
+460,26,Milk Powder,Mexico,United States of America,2025-08-05 00:00:00,Snickers
+460,14,Milk Powder,Mexico,United States of America,2025-09-07 00:00:00,Snickers
+460,10,Milk Powder,Mexico,United States of America,2025-10-11 00:00:00,Snickers
+480,21,Lecithin,Mexico,United States of America,2025-05-01 00:00:00,Snickers
+480,14,Lecithin,Mexico,United States of America,2025-06-02 00:00:00,Snickers
+480,26,Lecithin,Mexico,United States of America,2025-07-03 00:00:00,Snickers
+480,12,Lecithin,Mexico,United States of America,2025-08-05 00:00:00,Snickers
+480,30,Lecithin,Mexico,United States of America,2025-09-07 00:00:00,Snickers
+480,30,Lecithin,Mexico,United States of America,2025-10-11 00:00:00,Snickers
+555,22,Cocoa Butter,Mexico,United States of America,2025-05-01 00:00:00,Snickers
+555,10,Cocoa Butter,Mexico,United States of America,2025-06-02 00:00:00,Snickers
+555,27,Cocoa Butter,Mexico,United States of America,2025-07-03 00:00:00,Snickers
+555,23,Cocoa Butter,Mexico,United States of America,2025-08-05 00:00:00,Snickers
+555,21,Cocoa Butter,Mexico,United States of America,2025-09-07 00:00:00,Snickers
+555,18,Cocoa Butter,Mexico,United States of America,2025-10-11 00:00:00,Snickers
+435.44,19,Vanilla Extract,Mexico,United States of America,2025-05-01 00:00:00,Snickers
+435.44,10,Vanilla Extract,Mexico,United States of America,2025-06-02 00:00:00,Snickers
+435.44,11,Vanilla Extract,Mexico,United States of America,2025-07-03 00:00:00,Snickers
+435.44,27,Vanilla Extract,Mexico,United States of America,2025-08-05 00:00:00,Snickers
+435.44,29,Vanilla Extract,Mexico,United States of America,2025-09-07 00:00:00,Snickers
+435.44,30,Vanilla Extract,Mexico,United States of America,2025-10-11 00:00:00,Snickers
+71190.4,40,cover,Mexico,China,2025-05-01 00:00:00,Iphone
+71190.4,40,cover,Mexico,China,2025-06-02 00:00:00,Iphone
+71190.4,50,cover,Mexico,China,2025-07-03 00:00:00,Iphone
+71190.4,50,cover,Mexico,China,2025-08-05 00:00:00,Iphone
+71190.4,50,cover,Mexico,China,2025-09-07 00:00:00,Iphone
+71190.4,50,cover,Mexico,China,2025-10-11 00:00:00,Iphone

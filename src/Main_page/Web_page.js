@@ -28,37 +28,18 @@ const WebPage = () => {
   // Ingredient sourcing states
   const [ingredientSources, setIngredientSources] = useState({});
   const [ingredientControls, setIngredientControls] = useState({});
+  // Add state to store tariff data
+  const [tariffData, setTariffData] = useState({});
 
   // Raw material states for chart
   const [selectedRawMaterial, setSelectedRawMaterial] = useState('');
   const [isChartExpanded, setIsChartExpanded] = useState(false);
 
-  // Expanded raw material tariff data to include all ingredients
-  const rawMaterialTariffData = {
-    'Cocoa Butter': [
-      { country: 'USA', tariff: 10 },
-      { country: 'China', tariff: 15 },
-      { country: 'Germany', tariff: 8 },
-      { country: 'India', tariff: 12 },
-      { country: 'Brazil', tariff: 7 },
-      { country: 'European Union', tariff: 9 },
-      { country: 'New Zealand', tariff: 6 },
-      { country: 'Madagascar', tariff: 11 }
-    
-    ]
-  };
-
-  // Product-specific raw materials mapping with percentages
-  const productRawMaterials = {
-    'Automotive': {
-      'Cars': [
-        { name: 'Steel', percentage: 60 },
-        { name: 'Aluminum', percentage: 25 },
-        { name: 'Rubber', percentage: 10 },
-        { name: 'Plastic', percentage: 5 }
-      ]
-    }
-  };
+  // Replace hardcoded tariff data with dynamic state
+  const [rawMaterialTariffData, setRawMaterialTariffData] = useState({});
+  
+  // Replace static product raw materials mapping
+  const [productRawMaterials, setProductRawMaterials] = useState({});
 
   // Get ingredients for the selected product
   const getIngredients = () => {
@@ -75,8 +56,7 @@ const WebPage = () => {
 
   // Helper function to get available raw materials for selected category and product
   const getRawMaterialOptions = () => {
-    const ingredients = getIngredients();
-    return ingredients.map(ing => ing.name);
+    return Object.keys(rawMaterialTariffData);
   };
 
   // Get tariff data for current selections
@@ -305,9 +285,115 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
     alert('Documentation coming soon!');
   };
 
+  // Add function to load tariff data from supply chain file
+  const loadTariffData = async () => {
+    if (!selectedCountry || !selectedProduct) return;
+    
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const supplyFiles = files.filter(file => file.fileType === 'supplyChain');
+          
+          if (supplyFiles.length > 0) {
+            const latestFile = supplyFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            // Get relevant column indices
+            const rawMaterialIndex = latestFile.headers.indexOf('Raw_Material_Name');
+            const exportCountryIndex = latestFile.headers.indexOf('Export_Country');
+            const importCountryIndex = latestFile.headers.indexOf('Import_country');
+            const tariffIndex = latestFile.headers.indexOf('Tariffs');
+            const contractDateIndex = latestFile.headers.indexOf('contract_end_date');
+            const productSubCategoryIndex = latestFile.headers.indexOf('Product_Sub_Category');
+            
+            if (rawMaterialIndex !== -1 && exportCountryIndex !== -1 && importCountryIndex !== -1 && 
+                tariffIndex !== -1 && contractDateIndex !== -1 && productSubCategoryIndex !== -1) {
+              
+              // Filter rows by selected country and product
+              const filteredRows = latestFile.rows.filter(row => 
+                row[importCountryIndex] === selectedCountry && 
+                row[productSubCategoryIndex] === selectedProduct
+              );
+              
+              // Filter for month 5 (May) in contract_end_date and group by raw material
+              const tariffData = {};
+              const rawMaterials = {};
+              
+              filteredRows.forEach(row => {
+                const date = new Date(row[contractDateIndex]);
+                const month = date.getMonth() + 1; // JavaScript months are 0-indexed
+                
+                // Check if month is 5 (May)
+                if (month === 5) {
+                  const rawMaterialName = row[rawMaterialIndex];
+                  const exportCountry = row[exportCountryIndex];
+                  const tariff = parseFloat(row[tariffIndex]);
+                  
+                  // Add to tariff data
+                  if (!tariffData[rawMaterialName]) {
+                    tariffData[rawMaterialName] = [];
+                  }
+                  
+                  tariffData[rawMaterialName].push({
+                    country: exportCountry,
+                    tariff: tariff
+                  });
+                  
+                  // Build product raw materials data
+                  if (!rawMaterials[rawMaterialName]) {
+                    // Extract percentage if available or default to equal distribution
+                    const basePrice = parseFloat(row[latestFile.headers.indexOf('Base_Price_Per_Unit')]) || 0;
+                    rawMaterials[rawMaterialName] = { name: rawMaterialName, percentage: 0, basePrice: basePrice };
+                  }
+                }
+              });
+              
+              // Calculate percentages for materials if not explicitly given
+              const materialCount = Object.keys(rawMaterials).length;
+              if (materialCount > 0) {
+                const equalPercentage = 100 / materialCount;
+                Object.keys(rawMaterials).forEach(key => {
+                  rawMaterials[key].percentage = equalPercentage;
+                });
+                
+                // Create product raw materials structure
+                const newProductRawMaterials = {
+                  [selectedCategory]: {
+                    [selectedProduct]: Object.values(rawMaterials)
+                  }
+                };
+                
+                setProductRawMaterials(newProductRawMaterials);
+              }
+              
+              setRawMaterialTariffData(tariffData);
+            }
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading tariff data:', error);
+    }
+  };
+
+  // Add effect to load tariff data when form is submitted
+  useEffect(() => {
+    if (isSubmitted) {
+      loadTariffData();
+    }
+  }, [isSubmitted, selectedCountry, selectedProduct]);
+
+  // Update handleSubmit to reset the current tariff data
   const handleSubmit = () => {
     // Validate inputs
     if (selectedCountry && selectedType && selectedCategory && selectedProduct) {
+      setRawMaterialTariffData({}); // Reset tariff data before loading new data
       setIsSubmitted(true);
     } else {
       alert('Please fill in all fields before submitting');
@@ -341,8 +427,23 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
     setSelectedRawMaterial(e.target.value);
   };
 
-  // Add tariff constant
-  const TARIFF_PERCENTAGE = 5;
+  // Get tariff rate for country pair
+  const getTariffRate = (fromCountry, toCountry) => {
+    const key = `${fromCountry}-${toCountry}`;
+    return tariffData[key] !== undefined ? tariffData[key] : 'N/A';
+  };
+
+  // Add effect to load tariff data when component mounts
+  useEffect(() => {
+    loadTariffData();
+  }, []);
+
+  // Add effect to reload tariff data when country changes
+  useEffect(() => {
+    if (selectedCountry) {
+      loadTariffData();
+    }
+  }, [selectedCountry]);
 
   // Add this new function before the return statement
   const handleShowResults = () => {
@@ -738,7 +839,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
 
                               {/* Tariff Display */}
                               <span className="source-tariff">
-                                tariff: {TARIFF_PERCENTAGE}%
+                                tariff: {source.country ? getTariffRate(source.country, selectedCountry) : 'N/A'}%
                               </span>
 
                               {/* Remove Button */}

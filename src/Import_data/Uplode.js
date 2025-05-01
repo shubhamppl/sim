@@ -76,7 +76,7 @@ const Upload = () => {
           const dataRows = lines.slice(1).map(line => 
             line.split(',').map(cell => cell.trim())
           );
-          setRows(dataRows.slice(0, 10)); // Show first 10 rows
+          setRows(dataRows); // Show all rows
         };
         reader.readAsText(selectedFile);
       } else if (['xlsx', 'xls'].includes(fileExtension)) {
@@ -90,7 +90,7 @@ const Upload = () => {
           
           if (jsonData.length > 0) {
             setHeaders(jsonData[0]);
-            setRows(jsonData.slice(1, 11)); // Show first 10 rows
+            setRows(jsonData.slice(1)); // Show all rows
           }
         };
         reader.readAsArrayBuffer(selectedFile);
