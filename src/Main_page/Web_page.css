@@ -920,3 +920,65 @@ font-weight: 500;
   transform: none;
   box-shadow: none;
 }
+
+/* Styling for contract end date */
+.source-contract-date {
+  background-color: #f0f8ff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #0069d9;
+  margin-right: 8px;
+}
+
+/* Error message styling */
+.source-error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 8px;
+  margin: 8px 0;
+  border-radius: 4px;
+  font-size: 0.9em;
+  width: 100%;
+  text-align: center;
+}
+
+/* Disabled fields styling */
+input:disabled, select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.edit-source-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.save-source-btn {
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.edit-source-btn:hover {
+  background-color: #2980b9;
+}
+
+.save-source-btn:hover {
+  background-color: #219653;
+}
+
+.edit-source-btn:disabled, .save-source-btn:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}

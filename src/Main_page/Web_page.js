@@ -961,6 +961,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
               handleAddCountrySource={handleAddCountrySource}
               handleViewGraph={handleViewGraph}
               selectedCountry={selectedCountry}
+              setIngredientSources={setIngredientSources}
             />
 
             <div className="show-results-container">

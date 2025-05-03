@@ -1,19 +1,3 @@
-/**
- * IngredientGraph Component
- * 
- * This component provides a visualization of how tariffs affect ingredient prices.
- * It displays a bar chart comparing the base prices of ingredients from different countries
- * with and without applied tariffs.
- * 
- * Features:
- * - Shows a side-by-side comparison of prices with and without tariffs
- * - Handles multiple countries with different base prices
- * - Displays actual tariff percentages from the data
- * - Shows country-specific pricing details
- * 
- * Used within the main Web_page component when users click "View Graph"
- * for a specific ingredient.
- */
 
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';

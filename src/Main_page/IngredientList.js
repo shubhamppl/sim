@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Web_page.css';
+
+// Backend API URL
+const API_URL = "http://localhost:8000";
 
 /**
  * IngredientList Component
@@ -23,25 +26,124 @@ const IngredientList = ({
   handleRemoveCountrySource,
   handleAddCountrySource,
   handleViewGraph,
-  selectedCountry
+  selectedCountry,
+  setIngredientSources
 }) => {
   // State to track which sources are being edited
   const [editingSources, setEditingSources] = useState({});
+  
+  // State to track API loading and errors
+  const [loading, setLoading] = useState({});
+  const [errors, setErrors] = useState({});
+  const [apiData, setApiData] = useState({});
+
+  // Fetch ingredient data from API
+  const fetchSourceData = async (ingredientName, sourceIndex) => {
+    const key = `${ingredientName}-${sourceIndex}`;
+    
+    try {
+      // Mark as loading
+      setLoading(prev => ({ ...prev, [key]: true }));
+      setErrors(prev => ({ ...prev, [key]: null }));
+      
+      // Get the current source
+      const source = ingredientSources[ingredientName]?.[sourceIndex];
+      
+      if (!source || !source.country) {
+        throw new Error("Country must be selected before fetching data");
+      }
+      
+      // Make API request
+      const response = await fetch(`${API_URL}/ingredient-source-details/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ingredient_name: ingredientName,
+          product_name: selectedCountry, // Using selected country as product name for now
+          country: source.country,
+          import_country: selectedCountry,
+          cash_payment_delay: source.cashPaymentDelay || 0
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('API response:', data);
+      
+      if (!data.success) {
+        throw new Error(data.message || "Unknown error");
+      }
+      
+      // Store API data
+      setApiData(prev => ({ ...prev, [key]: data.data }));
+      
+      // Update source with API data
+      if (data.data) {
+        updateSourceFromApi(ingredientName, sourceIndex, data.data);
+      }
+      
+      return data.data;
+      
+    } catch (error) {
+      console.error("Error fetching source data:", error);
+      setErrors(prev => ({ ...prev, [key]: error.message }));
+      return null;
+    } finally {
+      setLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+  
+  // Update source data from API response
+  const updateSourceFromApi = (ingredientName, sourceIndex, apiData) => {
+    // Copy the current sources
+    const updatedSources = [...(ingredientSources[ingredientName] || [])];
+    
+    // Update the specific source with API data
+    if (updatedSources[sourceIndex]) {
+      updatedSources[sourceIndex] = {
+        ...updatedSources[sourceIndex],
+        basePrice: apiData.base_price_per_unit || updatedSources[sourceIndex].basePrice || 0,
+        tariffPercent: apiData.tariff_percent || 0,
+        contractEndDate: apiData.contract_end_date,
+        supplierDetails: apiData.supplier_details || {}
+      };
+      
+      // Update the ingredient sources
+      setIngredientSources(prev => ({
+        ...prev,
+        [ingredientName]: updatedSources
+      }));
+    }
+  };
 
   // Toggle edit mode for a specific source
-  const toggleEditMode = (ingredientName, sourceIndex, e) => {
+  const toggleEditMode = async (ingredientName, sourceIndex, e) => {
     e.stopPropagation(); // Prevent toggling the ingredient
     
+    const key = `${ingredientName}-${sourceIndex}`;
+    const isCurrentlyEditing = editingSources[key];
+    
+    // If not currently editing, fetch data from API when starting edit mode
+    if (!isCurrentlyEditing) {
+      await fetchSourceData(ingredientName, sourceIndex);
+    } else {
+      // If saving (ending edit mode), you could add API call to save data here
+      console.log("Saving changes for", ingredientName, sourceIndex);
+    }
+    
+    // Toggle edit mode in state
     setEditingSources(prev => {
-      const key = `${ingredientName}-${sourceIndex}`;
       const newState = { ...prev };
       
-      // If already editing, remove from edit state (save)
       if (newState[key]) {
-        delete newState[key];
+        delete newState[key]; // Turn off edit mode
       } else {
-        // Start editing
-        newState[key] = true;
+        newState[key] = true; // Turn on edit mode
       }
       
       return newState;
@@ -52,6 +154,38 @@ const IngredientList = ({
   const isEditing = (ingredientName, sourceIndex) => {
     const key = `${ingredientName}-${sourceIndex}`;
     return editingSources[key] === true;
+  };
+  
+  // Check if a source is loading
+  const isLoading = (ingredientName, sourceIndex) => {
+    const key = `${ingredientName}-${sourceIndex}`;
+    return loading[key] === true;
+  };
+  
+  // Get error for a source
+  const getError = (ingredientName, sourceIndex) => {
+    const key = `${ingredientName}-${sourceIndex}`;
+    return errors[key];
+  };
+  
+  // Get API data for a source
+  const getSourceApiData = (ingredientName, sourceIndex) => {
+    const key = `${ingredientName}-${sourceIndex}`;
+    return apiData[key];
+  };
+  
+  // Handle cash payment delay changes
+  const handleCashPaymentDelayChange = (ingredientName, sourceIndex, value) => {
+    // First update the source data
+    handleSourceSliderChange(ingredientName, sourceIndex, 'cashPaymentDelay', value);
+    
+    // Then refetch data with new cashPaymentDelay value to update contract end date
+    const source = ingredientSources[ingredientName]?.[sourceIndex];
+    if (source && source.country && isEditing(ingredientName, sourceIndex)) {
+      setTimeout(() => {
+        fetchSourceData(ingredientName, sourceIndex);
+      }, 300); // Add small delay to ensure state is updated
+    }
   };
   
   return (
@@ -79,6 +213,10 @@ const IngredientList = ({
                   <div className="ingredient-sources-wrapper">
                     {ingredientSources[ingredient.name]?.map((source, index) => {
                       const editing = isEditing(ingredient.name, index);
+                      const loading = isLoading(ingredient.name, index);
+                      const error = getError(ingredient.name, index);
+                      const sourceData = getSourceApiData(ingredient.name, index);
+                      
                       return (
                         // Individual source row - uses flexbox to put items in a line
                         <div key={index} className="ingredient-source-row">
@@ -87,7 +225,7 @@ const IngredientList = ({
                             className="source-select"
                             value={source.country}
                             onChange={(e) => handleCountrySourceChange(ingredient.name, index, e.target.value)}
-                            disabled={!editing}
+                            disabled={!editing || loading}
                           >
                             <option value="">Select Country</option>
                             {sourceCountryOptions.map(country => (
@@ -104,7 +242,7 @@ const IngredientList = ({
                                 max="100"
                                 value={source.supplierAbsorption || 0}
                                 onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'supplierAbsorption', parseInt(e.target.value))}
-                                disabled={!editing}
+                                disabled={!editing || loading}
                               />
                               <span>{source.supplierAbsorption || 0}%</span>
                             </div>
@@ -117,7 +255,7 @@ const IngredientList = ({
                                 max="100"
                                 value={source.manufacturerAbsorption || 0}
                                 onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'manufacturerAbsorption', parseInt(e.target.value))}
-                                disabled={!editing}
+                                disabled={!editing || loading}
                               />
                               <span>{source.manufacturerAbsorption || 0}%</span>
                             </div>  
@@ -129,8 +267,8 @@ const IngredientList = ({
                                 min="0"
                                 max="90"
                                 value={source.cashPaymentDelay || 0}
-                                onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'cashPaymentDelay', parseInt(e.target.value))}
-                                disabled={!editing}
+                                onChange={(e) => handleCashPaymentDelayChange(ingredient.name, index, parseInt(e.target.value))}
+                                disabled={!editing || loading}
                               />
                               <span>{source.cashPaymentDelay || 0} days</span>
                             </div>
@@ -145,7 +283,7 @@ const IngredientList = ({
                             max="100"
                             placeholder="%"
                             className="source-percentage-input"
-                            disabled={!editing}
+                            disabled={!editing || loading}
                           />
 
                           {/* Weight Display */}
@@ -155,15 +293,23 @@ const IngredientList = ({
 
                           {/* Tariff Display */}
                           <span className="source-tariff">
-                            tariff: {getTariffRate(source.country, selectedCountry)}%
+                            tariff: {source.tariffPercent || getTariffRate(source.country, selectedCountry)}%
                           </span>
+
+                          {/* Contract End Date - Show if available */}
+                          {source.contractEndDate && (
+                            <span className="source-contract-date">
+                              Contract End: {new Date(source.contractEndDate).toLocaleDateString()}
+                            </span>
+                          )}
 
                           {/* Edit/Save Button */}
                           <button
                             onClick={(e) => toggleEditMode(ingredient.name, index, e)}
                             className={editing ? "save-source-btn" : "edit-source-btn"}
+                            disabled={loading}
                           >
-                            {editing ? 'Save' : 'Edit'}
+                            {loading ? 'Loading...' : editing ? 'Save' : 'Edit'}
                           </button>
 
                           {/* Remove Button */}
@@ -173,12 +319,22 @@ const IngredientList = ({
                               handleRemoveCountrySource(ingredient.name, index);
                             }}
                             className="remove-source-btn"
-                            disabled={ingredientSources[ingredient.name]?.length <= 1 || !editing}
+                            disabled={ingredientSources[ingredient.name]?.length <= 1 || !editing || loading}
                           >
                             Remove
                           </button>
                         </div>
                       );
+                    })}
+                    
+                    {/* Error Display */}
+                    {ingredientSources[ingredient.name]?.map((_, index) => {
+                      const error = getError(ingredient.name, index);
+                      return error ? (
+                        <div key={`error-${index}`} className="source-error">
+                          Error: {error}
+                        </div>
+                      ) : null;
                     })}
                   </div>
 

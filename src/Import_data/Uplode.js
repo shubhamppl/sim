@@ -197,33 +197,6 @@ const Upload = () => {
     }
   };
 
-  // Function to send a file to the backend for processing
-  const processWithBackend = async (fileId) => {
-    try {
-      setIsProcessing(true);
-      
-      const db = await initDB();
-      const transaction = db.transaction(storeName, "readonly");
-      const store = transaction.objectStore(storeName);
-      const request = store.get(fileId);
-      
-      request.onsuccess = async () => {
-        const fileData = request.result;
-        
-        if (fileData && fileData.fileType === 'supplyChain') {
-          await sendToBackend(fileData);
-          setUploadStatus(`File ${fileId} sent to backend for processing`);
-        } else {
-          setUploadStatus('Only supply chain files can be processed with the backend');
-        }
-      };
-    } catch (error) {
-      setUploadStatus('Error processing with backend: ' + error.message);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const handleDelete = async (idToDelete) => {
     try {
       const db = await initDB();
@@ -275,7 +248,7 @@ const Upload = () => {
     navigate('/dashboard');
   };
 
-  // Modify the saved files table to add "Process" button
+  // Modify the saved files table to remove the "Process" button
   const renderSupplyChainFiles = () => (
     <>
       <div className='section-title'>Saved Supply Chain Files</div>
@@ -301,13 +274,6 @@ const Upload = () => {
                     onClick={() => handlePreview(savedFile.id)}
                   >
                     Preview
-                  </button>
-                  <button 
-                    className="process-btn"
-                    onClick={() => processWithBackend(savedFile.id)}
-                    disabled={isProcessing}
-                  >
-                    Process
                   </button>
                   <button 
                     className="delete-btn"
