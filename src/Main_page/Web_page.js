@@ -9,7 +9,8 @@ import {
   handleSourcePercentageChange, 
   handleSliderChange,
   initializeIngredientSources,
-  calculateSourceWeight as computeSourceWeight
+  calculateSourceWeight as computeSourceWeight,
+  loadUpdatedSupplyTable
 } from './SourceManagement';
 import CountryComparison from './Country_Comparison';
 import IngredientGraph from './IngredientGraph';
@@ -455,7 +456,8 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
         selectedCategory,
         selectedProduct,
         selectedQuantity: selectedType,
-        ingredientSources
+        ingredientSources,
+        ingredients: getIngredients() // Pass the actual ingredients data too
       }
     });
   };
@@ -826,6 +828,19 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
         <div style={{ display: 'flex', gap: '10px', position: 'relative', right: '20px', marginTop: '15px' }}>
           <button 
             className="view-table-btn" 
+            onClick={() => loadUpdatedSupplyTable(
+              selectedCountry,
+              selectedProduct,
+              dbName,
+              storeName,
+              setModalData,
+              setIsTableModalOpen
+            )}
+          >
+            Show Updated Table
+          </button>
+          <button 
+            className="view-table-btn" 
             onClick={() => loadTableData('product')}
           >
             View Product Table
@@ -961,6 +976,10 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
               handleAddCountrySource={handleAddCountrySource}
               handleViewGraph={handleViewGraph}
               selectedCountry={selectedCountry}
+              dbName={dbName}
+              storeName={storeName}
+              fetchCountryBasePrice={fetchCountryBasePrice}
+              setIngredientSources={setIngredientSources}
             />
 
             <div className="show-results-container">

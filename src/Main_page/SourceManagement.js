@@ -158,3 +158,71 @@ export const calculateSourceWeight = (ingredientPercentage, sourcePercentage, to
   const actualMultiplier = multiplier ? parseFloat(multiplier) : 1;
   return (baseWeight * (sourcePercentage / 100) * actualMultiplier).toFixed(2);
 };
+
+/**
+ * Load and display updated supply chain data filtered by country and product
+ * @param {string} selectedCountry - Currently selected country
+ * @param {string} selectedProduct - Currently selected product
+ * @param {string} dbName - IndexedDB database name
+ * @param {string} storeName - IndexedDB store name
+ * @param {function} setModalData - Function to set modal data
+ * @param {function} setIsTableModalOpen - Function to open modal
+ */
+export const loadUpdatedSupplyTable = async (
+  selectedCountry,
+  selectedProduct,
+  dbName,
+  storeName,
+  setModalData,
+  setIsTableModalOpen
+) => {
+  if (!selectedCountry || !selectedProduct) {
+    alert('Please select a country and product first.');
+    return;
+  }
+  
+  try {
+    const db = await indexedDB.open(dbName, 1);
+    db.onsuccess = (event) => {
+      const db = event.target.result;
+      const transaction = db.transaction(storeName, "readonly");
+      const store = transaction.objectStore(storeName);
+      const request = store.getAll();
+      
+      request.onsuccess = () => {
+        const files = request.result;
+        const supplyFiles = files.filter(file => file.fileType === 'supplyChain');
+        
+        if (supplyFiles.length > 0) {
+          const latestFile = supplyFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+          
+          // Get column indices
+          const importCountryIndex = latestFile.headers.indexOf('Import_country');
+          const productSubCategoryIndex = latestFile.headers.indexOf('Product_Sub_Category');
+          
+          if (importCountryIndex !== -1 && productSubCategoryIndex !== -1) {
+            // Filter rows based on selection
+            const filteredRows = latestFile.rows.filter(row => 
+              row[importCountryIndex] === selectedCountry && 
+              row[productSubCategoryIndex] === selectedProduct
+            );
+            
+            setModalData({
+              headers: latestFile.headers,
+              rows: filteredRows,
+              title: 'Updated Supply Chain Data for ' + selectedProduct + ' in ' + selectedCountry
+            });
+            setIsTableModalOpen(true);
+          } else {
+            alert('Could not find required columns in the supply chain data.');
+          }
+        } else {
+          alert('No supply chain data available. Please upload a file first.');
+        }
+      };
+    };
+  } catch (error) {
+    console.error('Error loading updated supply data:', error);
+    alert('Error loading data. Please try again.');
+  }
+};

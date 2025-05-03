@@ -17,12 +17,44 @@ const Dashboard = () => {
   const [product, setProduct] = useState(location.state?.selectedProduct || 'Snickers');
   const [quantity, setQuantity] = useState(location.state?.selectedQuantity || 1);
 
+  // Get ingredients from passed data instead of hardcoding
+  const [ingredients, setIngredients] = useState([]);
+
   useEffect(() => {
     if (location.state) {
       setCountry(location.state.selectedCountry);
       setCategory(location.state.selectedCategory);
       setProduct(location.state.selectedProduct);
       setQuantity(location.state.selectedQuantity);
+      
+      console.log("Ingredient sources from state:", location.state.ingredientSources);
+      console.log("Raw ingredients from state:", location.state.ingredients);
+      
+      // Extract ingredients directly from ingredientSources
+      if (location.state.ingredientSources) {
+        const extractedIngredients = [];
+        Object.keys(location.state.ingredientSources).forEach((name, index) => {
+          // Find percentage from ingredients array if available
+          let ingredientPercentage = 20; // Default fallback percentage
+          
+          if (location.state.ingredients && Array.isArray(location.state.ingredients)) {
+            const foundIngredient = location.state.ingredients.find(ing => ing.name === name);
+            if (foundIngredient) {
+              ingredientPercentage = foundIngredient.percentage || ingredientPercentage;
+            }
+          }
+          
+          extractedIngredients.push({
+            id: index + 1,
+            name: name,
+            percentage: ingredientPercentage,
+            details: ''
+          });
+        });
+        
+        console.log("Extracted ingredients:", extractedIngredients);
+        setIngredients(extractedIngredients);
+      }
     }
   }, [location.state]);
 
@@ -45,24 +77,9 @@ const Dashboard = () => {
     }
   }, [location.state]);
 
-  const ingredients = [
-    { id: 1, name: 'Cocoa Butter', percentage: 32.79, details: '' },
-    { id: 2, name: 'Sugar', percentage: 38.26, details: '' },
-    { id: 3, name: 'Milk Powder', percentage: 27.37, details: '' },
-    { id: 4, name: 'Vanilla Extract', percentage: 1.09, details: '' },
-    { id: 5, name: 'Lecithin', percentage: 0.49, details: '' }
-  ];
-
   const countryOptions = [
     'United States', 'China', 'India', 'Brazil', 'European Union', 'New Zealand', 'Madagascar'
   ];
-
-  const productOptions = {
-    'Automotive': ['Cars', 'Spare Parts', 'Tires'],
-    'Electronics': ['Smartphones', 'Laptops', 'Tablets'],
-    'Textiles': ['Cotton', 'Silk', 'Wool'],
-    'Food & Beverages': ['Snickers', 'Mars', 'Twix']
-  };
 
   const initializeIngredientSources = (ingredientId) => {
     if (!ingredientSources[ingredientId]) {
@@ -169,12 +186,25 @@ const Dashboard = () => {
     return sourceWeight;
   };
 
+  // Modify toggleIngredient for better debugging
   const toggleIngredient = (id) => {
+    console.log("Toggling ingredient ID:", id);
+    const ingredientItem = ingredients.find(ing => ing.id === id);
+    console.log("Found ingredient:", ingredientItem);
+    
     if (expandedIngredient === id) {
       setExpandedIngredient(null);
     } else {
       setExpandedIngredient(id);
-      initializeIngredientSources(id);
+      if (ingredientItem) {
+        console.log("Checking sources for:", ingredientItem.name);
+        console.log("Available sources:", ingredientSources[ingredientItem.name]);
+        
+        if (!ingredientSources[ingredientItem.name]) {
+          console.log("Initializing sources for:", ingredientItem.name);
+          initializeIngredientSources(ingredientItem.name);
+        }
+      }
     }
   };
 
@@ -196,24 +226,49 @@ const Dashboard = () => {
   };
 
   const calculateTariffImpact = () => {
-    const totalCost = quantity * 100;
-    const tariffAmount = totalCost * (tariffRate / 100);
+    // Calculate tariff impact based on actual ingredient data from passed sources
+    let totalCost = 0;
+    let totalTariff = 0;
+    
+    // Loop through all ingredients and their sources to calculate totals
+    Object.entries(ingredientSources).forEach(([ingredientName, sources]) => {
+      const ingredient = ingredients.find(ing => ing.name === ingredientName);
+      if (ingredient) {
+        sources.forEach(source => {
+          if (source.country && source.percentage) {
+            const ingredientWeight = calculateIngredientWeight(ingredient.percentage);
+            const sourceWeight = (ingredientWeight * source.percentage / 100);
+            const sourceCost = sourceWeight * (source.basePrice || 10); // Use basePrice or default
+            const sourceTariff = sourceCost * (tariffRate / 100);
+            
+            totalCost += sourceCost;
+            totalTariff += sourceTariff;
+          }
+        });
+      }
+    });
+    
+    // If no data, use default calculation
+    if (totalCost === 0) {
+      totalCost = quantity * 100;
+      totalTariff = totalCost * (tariffRate / 100);
+    }
     
     // Calculate absorption amounts
-    const supplierAmount = tariffAmount * (supplierAbsorption / 100)
-    const manufacturerAmount = tariffAmount * (manufacturerAbsorption / 100);
-    const customerAmount = tariffAmount * (customerAbsorption / 100);
-    const remainingAmount = tariffAmount * (remainingImpact / 100);
+    const supplierAmount = totalTariff * (supplierAbsorption / 100)
+    const manufacturerAmount = totalTariff * (manufacturerAbsorption / 100);
+    const customerAmount = totalTariff * (customerAbsorption / 100);
+    const remainingAmount = totalTariff * (remainingImpact / 100);
 
     return {
       withoutTariff: totalCost,
-      withTariff: totalCost + tariffAmount,
-      tariffAmount,
+      withTariff: totalCost + totalTariff,
+      tariffAmount: totalTariff,
       supplierAmount,
       manufacturerAmount,
       customerAmount,
       remainingAmount,
-      effectiveRate: (tariffAmount / totalCost) * 100
+      effectiveRate: (totalTariff / totalCost) * 100
     };
   };
 
@@ -331,16 +386,19 @@ const Dashboard = () => {
             <div className="ingredient-config-section">
               <button 
                 className="ingredient-config-toggle" 
-                onClick={() => setShowIngredientConfig(!showIngredientConfig)}
+                onClick={() => {
+                  console.log("Toggling ingredient panel, current state:", !showIngredientConfig);
+                  console.log("Available ingredients:", ingredients);
+                  setShowIngredientConfig(!showIngredientConfig);
+                }}
               >
                 {showIngredientConfig ? 'Hide Ingredients' : 'Configure Ingredients'}
               </button>
               
-              {showIngredientConfig && (
+              {showIngredientConfig && ingredients.length > 0 ? (
                 <div className="ingredients-panel">
                   <p className="config-text">Configure the ingredients quantities and specifications:</p>
 
-                  
                   <div className="ingredients-list-sidebar">
                     {ingredients.map(ingredient => (
                       <div key={ingredient.id} className="ingredient-item-sidebar">
@@ -358,17 +416,15 @@ const Dashboard = () => {
 
                         {expandedIngredient === ingredient.id && (
                           <div className="ingredient-expanded-sidebar">
-                            {ingredientSources[ingredient.id]?.map((source, index) => (
+                            {ingredientSources[ingredient.name]?.map((source, index) => (
                               <div key={index} className="source-row-sidebar">
                                 <select
                                   className="source-select-sidebar"
                                   value={source.country}
-                                  onChange={(e) => handleSourceCountryChange(ingredient.id, index, e.target.value)}
+                                  onChange={(e) => handleSourceCountryChange(ingredient.name, index, e.target.value)}
+                                  disabled={true} // Disable editing in results view
                                 >
-                                  <option value="">Country</option>
-                                  {countryOptions.map(country => (
-                                    <option key={country} value={country}>{country}</option>
-                                  ))}
+                                  <option value={source.country}>{source.country || "No country selected"}</option>
                                 </select>
                                 
                                 <div className="source-inputs-sidebar">
@@ -376,9 +432,7 @@ const Dashboard = () => {
                                     <input
                                       type="number"
                                       value={source.percentage}
-                                      onChange={(e) => handleSourcePercentageChange(ingredient.id, index, e.target.value)}
-                                      min="0"
-                                      max="100"
+                                      disabled={true} // Disable editing in results view
                                       className="source-percentage-input-sidebar"
                                     />
                                     <span>%</span>
@@ -387,17 +441,6 @@ const Dashboard = () => {
                                   <div className="source-weight-sidebar">
                                     {calculateSourceWeight(ingredient.percentage, source.percentage)}g
                                   </div>
-                                  
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      removeCountrySource(ingredient.id, index);
-                                    }}
-                                    className="remove-source-btn-sidebar"
-                                    disabled={ingredientSources[ingredient.id]?.length <= 1}
-                                  >
-                                    ✕
-                                  </button>
                                 </div>
 
                                 <div className="sliders-sidebar">
@@ -408,7 +451,7 @@ const Dashboard = () => {
                                       min="0"
                                       max="100"
                                       value={source.supplierAbsorption || 0}
-                                      onChange={(e) => handleSliderChange(ingredient.id, index, 'supplierAbsorption', parseInt(e.target.value))}
+                                      disabled={true} // Disable editing in results view
                                     />
                                   </div>
                                   
@@ -419,7 +462,7 @@ const Dashboard = () => {
                                       min="0"
                                       max="100"
                                       value={source.manufacturerAbsorption || 0}
-                                      onChange={(e) => handleSliderChange(ingredient.id, index, 'manufacturerAbsorption', parseInt(e.target.value))}
+                                      disabled={true} // Disable editing in results view
                                     />
                                   </div>
                                   
@@ -430,32 +473,26 @@ const Dashboard = () => {
                                       min="0"
                                       max="90"
                                       value={source.cashPaymentDelay || 0}
-                                      onChange={(e) => handleSliderChange(ingredient.id, index, 'cashPaymentDelay', parseInt(e.target.value))}
+                                      disabled={true} // Disable editing in results view
                                     />
                                   </div>
                                 </div>
                               </div>
                             ))}
-                            
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                addCountrySource(ingredient.id);
-                              }}
-                              className="add-country-btn-sidebar"
-                            >
-                              Add Country
-                            </button>
                           </div>
                         )}
                       </div>
                     ))}
                   </div>
                 </div>
-              )}
+              ) : showIngredientConfig ? (
+                <div className="ingredients-panel">
+                  <p className="config-text">No ingredients available for this product.</p>
+                </div>
+              ) : null}
             </div>
 
-            <button className="simulate-button">Update Simulation</button>
+            <button onClick={handleBackClick} className="simulate-button">Back to Simulator</button>
           </div>
         </aside>
 

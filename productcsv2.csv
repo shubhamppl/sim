@@ -1,12 +1,12 @@
-HS_Code,To_Country,From_Country,Product_Category,Product_Sub_Category,Raw_Material_Name,Base_Price_Per_Unit,payment_term_days,Current_Tariff_Percent,Future_Tariff_Percent,Import_Percent,Product_percent_requied,Find_per_kg,Shipping_charges,Shipping_unit
-402,United States of America,India,Food & Beverages,Snickers,Milk Powder,454.61,60,10,20,50,20,0.01,100000,Per_ton
-402,United States of America,Malaysia,Food & Beverages,Snickers,Milk Powder,492.48,30,12,15,50,20,0.01,120000,Per_ton
-1507,United States of America,Australia,Food & Beverages,Snickers,Lecithin,488.01,30,15,20,100,30,0.01,130000,Per_ton
-1806,United States of America,Germany,Food & Beverages,Snickers,Cocoa Butter,556.84,60,10,20,50,20,0.01,120000,Per_ton
-1806,United States of America,Indonesia,Food & Beverages,Snickers,Cocoa Butter,588.04,30,20,15,50,20,0.01,90000,Per_ton
-2008,United States of America,Mexico,Food & Beverages,Snickers,Vanilla Extract,435.44,60,25,15,100,20,0.01,100000,Per_ton
-1112,United States of America,India,Food & Beverages,Snickers,Sugar,790.4,30,10,15,100,10,0.01,130000,Per_ton
-1112,China,India,Technology,Iphone,cover,71190.4,0,40,115,1000,100,1,1000000,Per_ton
+HS_Code,To_Country,From_Country,Product_Category,Product_Sub_Category,Raw_Material_Name,Base_Price_Per_Unit,payment_term_days,Current_Tariff_Percent,Future_Tariff_Percent,Import_Percent,Product_percent_requied,Find_per_kg,Shipping_cost,Shipping_cost_unit
+402,United States of America,India,Food & Beverages,Snickers,Milk Powder,454.61,60,10,20,50,20,0.01,100000,Per_Ton
+402,United States of America,Malaysia,Food & Beverages,Snickers,Milk Powder,492.48,30,12,15,50,20,0.01,120000,Per_Ton
+1507,United States of America,Australia,Food & Beverages,Snickers,Lecithin,488.01,30,15,20,100,30,0.01,130000,Per_Ton
+1806,United States of America,Germany,Food & Beverages,Snickers,Cocoa Butter,556.84,60,10,20,50,20,0.01,90000,Per_Ton
+1806,United States of America,Indonesia,Food & Beverages,Snickers,Cocoa Butter,588.04,30,20,15,50,20,0.01,100000,Per_Ton
+2008,United States of America,Mexico,Food & Beverages,Snickers,Vanilla Extract,435.44,60,25,15,100,20,0.01,120000,Per_Ton
+1112,United States of America,India,Food & Beverages,Snickers,Sugar,790.4,30,10,15,100,10,0.01,100000,Per_Ton
+1112,China,India,Technology,Iphone,cover,71190.4,0,40,115,1000,100,1,10000000,Per_Ton
 ,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,
