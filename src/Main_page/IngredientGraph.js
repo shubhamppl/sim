@@ -1,3 +1,20 @@
+/**
+ * IngredientGraph Component
+ * 
+ * This component provides a visualization of how tariffs affect ingredient prices.
+ * It displays a bar chart comparing the base prices of ingredients from different countries
+ * with and without applied tariffs.
+ * 
+ * Features:
+ * - Shows a side-by-side comparison of prices with and without tariffs
+ * - Handles multiple countries with different base prices
+ * - Displays actual tariff percentages from the data
+ * - Shows country-specific pricing details
+ * 
+ * Used within the main Web_page component when users click "View Graph"
+ * for a specific ingredient.
+ */
+
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -44,15 +61,18 @@ const IngredientGraph = ({
       // For single country, show with/without tariff
       const source = validSources[0];
       const tariffRate = getTariffRate(source.country, selectedCountry);
-      const withoutTariffPrice = basePrice;
-      const withTariffPrice = basePrice * (1 + tariffRate / 100);
+      // Use country-specific base price if available, otherwise fall back to the default
+      const countryBasePrice = source.basePrice || basePrice;
+      const withoutTariffPrice = countryBasePrice;
+      const withTariffPrice = countryBasePrice * (1 + tariffRate / 100);
       
       return {
         data: [
           { 
             name: source.country, 
             withoutTariff: withoutTariffPrice,
-            withTariff: withTariffPrice 
+            withTariff: withTariffPrice,
+            tariffRate: tariffRate
           }
         ],
         keys: ['withoutTariff', 'withTariff']
@@ -61,13 +81,16 @@ const IngredientGraph = ({
       // For multiple countries, show each country with both prices
       const data = validSources.map(source => {
         const tariffRate = getTariffRate(source.country, selectedCountry);
-        const withoutTariffPrice = basePrice;
-        const withTariffPrice = basePrice * (1 + tariffRate / 100);
+        // Use country-specific base price if available
+        const countryBasePrice = source.basePrice || basePrice;
+        const withoutTariffPrice = countryBasePrice;
+        const withTariffPrice = countryBasePrice * (1 + tariffRate / 100);
         
         return {
           name: source.country,
           withoutTariff: withoutTariffPrice,
-          withTariff: withTariffPrice
+          withTariff: withTariffPrice,
+          tariffRate: tariffRate
         };
       });
       
@@ -124,10 +147,12 @@ const IngredientGraph = ({
                 </BarChart>
               </ResponsiveContainer>
               <div className="chart-details" style={{ marginTop: '20px', textAlign: 'center' }}>
-                <p>Base Price: ${basePrice.toFixed(2)}</p>
-                {sources?.length > 0 && sources[0].country && (
-                  <p>Tariff Rate: {getTariffRate(sources[0].country, selectedCountry)}%</p>
-                )}
+                <p>Base Price: Country-specific prices are shown in the chart</p>
+                {data.map((item, index) => (
+                  <div key={index} style={{margin: '5px 0'}}>
+                    <p>{item.name} - Base Price: ${item.withoutTariff.toFixed(2)} | Tariff: {item.tariffRate}%</p>
+                  </div>
+                ))}
               </div>
             </div>
           ) : (

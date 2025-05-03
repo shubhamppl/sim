@@ -13,6 +13,7 @@ import {
 } from './SourceManagement';
 import CountryComparison from './Country_Comparison';
 import IngredientGraph from './IngredientGraph';
+import IngredientList from './IngredientList'; // Import the new component
 
 const dbName = "TariffDB";
 const storeName = "files";
@@ -185,8 +186,14 @@ const colors = generateColors(countryOptions.length);
 const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, colors[i]]));
 
   // Using imported functions with state passed in
-  const handleAddCountrySource = (ingredientId) => {
-    addCountrySource(ingredientId, ingredientSources, setIngredientSources);
+  const handleAddCountrySource = async (ingredientId) => {
+    const newSource = await addCountrySource(ingredientId, ingredientSources, setIngredientSources);
+    
+    // After adding source, we'll add an effect to update base prices when country changes
+    if (newSource) {
+      // This will trigger the useEffect below that watches ingredientSources
+      console.log("New source added, will fetch prices when country is selected");
+    }
   };
 
   const handleRemoveCountrySource = (ingredientId, index) => {
@@ -195,6 +202,11 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
 
   const handleCountrySourceChange = (ingredientId, index, country) => {
     handleSourceCountryChange(ingredientId, index, country, ingredientSources, setIngredientSources);
+    
+    // Fetch base price when country changes
+    if (country) {
+      fetchCountryBasePrice(ingredientId, country);
+    }
   };
 
   const handlePercentageChange = (ingredientId, index, percentage) => {
@@ -707,6 +719,73 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
     }
   };
 
+  // Add a new function to fetch country-specific base prices
+  const fetchCountryBasePrice = async (ingredientName, country) => {
+    if (!country) return null;
+    
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const productFiles = files.filter(file => file.fileType === 'product');
+          
+          if (productFiles.length > 0) {
+            const latestFile = productFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            const rawMaterialIndex = latestFile.headers.indexOf('Raw_Material_Name');
+            const fromCountryIndex = latestFile.headers.indexOf('From_Country');
+            const basePriceIndex = latestFile.headers.indexOf('Base_Price_Per_Unit');
+            
+            if (rawMaterialIndex !== -1 && fromCountryIndex !== -1 && basePriceIndex !== -1) {
+              // Find the matching row for this ingredient and country
+              const matchingRow = latestFile.rows.find(row => 
+                row[rawMaterialIndex] === ingredientName && 
+                row[fromCountryIndex] === country
+              );
+              
+              if (matchingRow) {
+                const basePrice = parseFloat(matchingRow[basePriceIndex]) || 0;
+                
+                // Update the ingredient source with the base price
+                setIngredientSources(prev => {
+                  const updatedSources = {...prev};
+                  const sourceIndex = updatedSources[ingredientName]?.findIndex(s => s.country === country);
+                  
+                  if (sourceIndex !== -1 && updatedSources[ingredientName]) {
+                    updatedSources[ingredientName][sourceIndex].basePrice = basePrice;
+                  }
+                  
+                  return updatedSources;
+                });
+              }
+            }
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error fetching base price:', error);
+    }
+  };
+
+  // Watch for country changes in ingredient sources and fetch base prices
+  useEffect(() => {
+    // Check each ingredient
+    Object.entries(ingredientSources).forEach(([ingredientName, sources]) => {
+      // Check each source
+      sources.forEach(source => {
+        if (source.country && !source.basePrice) {
+          fetchCountryBasePrice(ingredientName, source.country);
+        }
+      });
+    });
+  }, [ingredientSources]);
+
   return (
     <div className="tariff-simulator">
       <div className="header">
@@ -865,151 +944,25 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
             {/* Replace the chart code with our new component */}
             <CountryComparison rawMaterialTariffData={rawMaterialTariffData} />
 
+            {/* Replace the ingredient list with the new component */}
+            <IngredientList 
+              ingredients={getIngredients()}
+              ingredientSources={ingredientSources}
+              expandedIngredient={expandedIngredient}
+              toggleIngredient={toggleIngredient}
+              calculateIngredientWeight={calculateIngredientWeight}
+              calculateSourceWeight={calculateSourceWeight}
+              getTariffRate={getTariffRate}
+              sourceCountryOptions={sourceCountryOptions}
+              handleCountrySourceChange={handleCountrySourceChange}
+              handleSourceSliderChange={handleSourceSliderChange}
+              handlePercentageChange={handlePercentageChange}
+              handleRemoveCountrySource={handleRemoveCountrySource}
+              handleAddCountrySource={handleAddCountrySource}
+              handleViewGraph={handleViewGraph}
+              selectedCountry={selectedCountry}
+            />
 
-            <p className="config-text">Configure the ingredients quantities and specifications (source countries auto-populated from data):</p>
-            
-            <div className="ingredients-list">
-              {getIngredients().map(ingredient => (
-                <div key={ingredient.name} className="ingredient-item">
-                  <div className="ingredient-row" onClick={() => toggleIngredient(ingredient.name)} style={{ display: 'flex', alignItems: 'center', padding: '15px', justifyContent: 'space-between', cursor: 'pointer' }}>
-                    <div className="ingredient-info" style={{ display: 'flex', gap: '20px' }}>
-                      <div className="ingredient-name">{ingredient.name}</div>
-                      <div className="ingredient-percentage">percent: {ingredient.percentage}%</div>
-                      <div className="ingredient-weight">weight: {calculateIngredientWeight(ingredient.percentage)}kg</div>
-                    </div>
-                    <div className="expand-icon">
-                      {expandedIngredient === ingredient.name ? '▼' : '▶'}
-                    </div>
-                  </div>
-
-                  {expandedIngredient === ingredient.name && (
-                    <div className="ingredient-expanded-content" style={{ padding: '15px', borderTop: '1px solid #eee' }}>
-                      <div className="ingredient-sourcing-container">
-                        {/* Wrapper for individual source rows */}
-                        <div className="ingredient-sources-wrapper">
-                          {ingredientSources[ingredient.name]?.map((source, index) => (
-                            // Individual source row - uses flexbox to put items in a line
-                            <div key={index} className="ingredient-source-row">
-                              {/* Country Select - Modified to use sourceCountryOptions */}
-                              <select
-                                className="source-select"
-                                value={source.country}
-                                onChange={(e) => handleCountrySourceChange(ingredient.name, index, e.target.value)}
-                              >
-                                <option value="">Select Country</option>
-                                {sourceCountryOptions.map(country => (
-                                  <option key={country} value={country}>{country}</option>
-                                ))}
-                              </select>
-
-                              <div className="slider-controls">
-                                <div className="slider-group">
-                                  <label>Supplier Absorption (%)</label>
-                                  <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value={source.supplierAbsorption || 0}
-                                    onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'supplierAbsorption', parseInt(e.target.value))}
-                                  />
-                                  <span>{source.supplierAbsorption || 0}%</span>
-                                </div>
-
-                                <div className="slider-group">
-                                  <label>Manufacturer Absorption (%)</label>
-                                  <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value={source.manufacturerAbsorption || 0}
-                                    onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'manufacturerAbsorption', parseInt(e.target.value))}
-                                  />
-                                  <span>{source.manufacturerAbsorption || 0}%</span>
-                                </div>  
-
-                                <div className="slider-group">
-                                  <label>Cash Payment Delay (days)</label>
-                                  <input
-                                    type="range"
-                                    min="0"
-                                    max="90"
-                                    value={source.cashPaymentDelay || 0}
-                                    onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'cashPaymentDelay', parseInt(e.target.value))}
-                                  />
-                                  <span>{source.cashPaymentDelay || 0} days</span>
-                                </div>
-                              </div>
-
-                              {/* Percentage Input */}
-                              <input
-                                type="number"
-                                value={source.percentage}
-                                onChange={(e) => handlePercentageChange(ingredient.name, index, e.target.value)}
-                                min="0"
-                                max="100"
-                                placeholder="%"
-                                className="source-percentage-input"
-                              />
-
-                              {/* Weight Display - Updated to read directly from new function */}
-                              <span className="source-weight">
-                                weight: {calculateSourceWeight(ingredient.percentage, source.percentage)}kg
-                              </span>
-
-                              {/* Tariff Display - Using actual tariff from product table */}
-                              <span className="source-tariff">
-                                tariff: {getTariffRate(source.country, selectedCountry)}%
-                              </span>
-
-                              {/* Remove Button */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation(); // Prevent toggling the ingredient
-                                  handleRemoveCountrySource(ingredient.name, index);
-                                }}
-                                className="remove-source-btn"
-                                disabled={ingredientSources[ingredient.name]?.length <= 1}
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Add Country Button container - reordered buttons */}
-                        <div className="add-country-btn-container">
-                          <button
-                            onClick={(e) => handleViewGraph(ingredient.name, e)}
-                            className="view-graph-btn"
-                          >
-                            View Graph
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Add your simulation logic here
-                              console.log('Simulating for:', ingredient.name);
-                            }}
-                            className="simulate-btn"
-                          >
-                            Simulate
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAddCountrySource(ingredient.name);
-                            }}
-                            className="add-country-btn"
-                          >
-                            Add Country
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
             <div className="show-results-container">
               <button onClick={handleShowResults} className="show-results-btn">Show Results</button>
             </div>

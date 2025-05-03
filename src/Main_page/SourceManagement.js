@@ -3,6 +3,7 @@
  * @param {string} ingredientId - ID/name of the ingredient
  * @param {object} ingredientSources - Current ingredient sources state
  * @param {function} setIngredientSources - Function to set ingredient sources state
+ * @returns {object|null} - The newly added source or null if not added
  */
 export const addCountrySource = (ingredientId, ingredientSources, setIngredientSources) => {
   const currentSources = ingredientSources[ingredientId] || [];
@@ -10,16 +11,26 @@ export const addCountrySource = (ingredientId, ingredientSources, setIngredientS
   const currentTotal = currentSources.reduce((sum, source) => sum + (parseFloat(source.percentage) || 0), 0);
 
   if (currentTotal < 100) {
-    const newSources = [
-      ...currentSources,
-      { country: '', percentage: 100 - currentTotal, supplierAbsorption: 0, manufacturerAbsorption: 100, cashPaymentDelay: 0 }
-    ];
+    const newSource = { 
+      country: '', 
+      percentage: 100 - currentTotal, 
+      supplierAbsorption: 0, 
+      manufacturerAbsorption: 100, 
+      cashPaymentDelay: 0,
+      basePrice: 0 // Add basePrice field
+    };
+    
+    const newSources = [...currentSources, newSource];
+    
     setIngredientSources(prev => ({
       ...prev,
       [ingredientId]: newSources
     }));
+    
+    return newSource;
   } else {
     alert("Total percentage already equals 100%. Adjust existing values before adding more.");
+    return null;
   }
 };
 
