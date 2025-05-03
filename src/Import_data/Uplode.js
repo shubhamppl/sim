@@ -67,25 +67,36 @@ const Upload = () => {
         // Handle CSV files
         const reader = new FileReader();
         reader.onload = (event) => {
+          // Get the raw content of the file as text
           const content = event.target.result;
+          // Split the content by new lines to separate each row
           const lines = content.split('\n');
           
+          // Extract the first line as headers, remove whitespace from each header
           const headerRow = lines[0].split(',').map(header => header.trim());
           setHeaders(headerRow);
 
+          // Process all remaining lines as data rows
+          // For each line: split by comma and trim whitespace from each cell
           const dataRows = lines.slice(1).map(line => 
             line.split(',').map(cell => cell.trim())
           );
+          // Save all processed rows to state
           setRows(dataRows); // Show all rows
         };
+        // Start reading the file as text
         reader.readAsText(selectedFile);
       } else if (['xlsx', 'xls'].includes(fileExtension)) {
         // Handle Excel files
         const reader = new FileReader();
         reader.onload = (event) => {
+          // Convert the file content to a binary array
           const data = new Uint8Array(event.target.result);
+          // Parse the Excel file using XLSX library
           const workbook = XLSX.read(data, { type: 'array' });
+          // Get the first worksheet from the workbook
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          // Convert the worksheet to JSON format with array structure
           const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
           
           if (jsonData.length > 0) {
@@ -333,6 +344,7 @@ const Upload = () => {
                     </tr>
                   </thead>
                   <tbody>
+                    {/* View Supply Chain Table - Displays all saved supply chain files */}
                     {savedFiles.filter(file => file.fileType === 'supplyChain').map((savedFile) => (
                       <tr key={savedFile.id}>
                         <td>{savedFile.id}</td>
@@ -372,6 +384,7 @@ const Upload = () => {
                     </tr>
                   </thead>
                   <tbody>
+                    {/* View Product Table - Displays all saved product files */}
                     {savedFiles.filter(file => file.fileType === 'product').map((savedFile) => (
                       <tr key={savedFile.id}>
                         <td>{savedFile.id}</td>

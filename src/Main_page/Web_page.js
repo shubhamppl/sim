@@ -182,7 +182,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
           country: '', 
           percentage: 100,
           supplierAbsorption: 0,
-          manufacturerAbsorption: 0,
+          manufacturerAbsorption: 100,
           cashPaymentDelay: 0
         }]
       }));
@@ -198,7 +198,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
     if (currentTotal < 100) {
       const newSources = [
         ...currentSources,
-        { country: '', percentage: 100 - currentTotal, supplierAbsorption: 0, manufacturerAbsorption: 0, cashPaymentDelay: 0 }
+        { country: '', percentage: 100 - currentTotal, supplierAbsorption: 0, manufacturerAbsorption: 100, cashPaymentDelay: 0 }
       ];
       setIngredientSources(prev => ({
         ...prev,
@@ -216,7 +216,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
 
     // If removing the last source, add one empty source
     if (newSources.length === 0) {
-      newSources.push({ country: '', percentage: 100, supplierAbsorption: 0, manufacturerAbsorption: 0, cashPaymentDelay: 0 });
+      newSources.push({ country: '', percentage: 100, supplierAbsorption: 0, manufacturerAbsorption: 100, cashPaymentDelay: 0 });
     }
 
     setIngredientSources(prev => ({
@@ -250,7 +250,21 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
   // Handle slider changes
   const handleSliderChange = (ingredientId, index, field, value) => {
     const newSources = [...ingredientSources[ingredientId]];
-    newSources[index][field] = value;
+    
+    // For supplier and manufacturer absorption, maintain sum = 100%
+    if (field === 'supplierAbsorption') {
+      newSources[index][field] = value;
+      newSources[index]['manufacturerAbsorption'] = 100 - value;
+    } 
+    else if (field === 'manufacturerAbsorption') {
+      newSources[index][field] = value;
+      newSources[index]['supplierAbsorption'] = 100 - value;
+    }
+    // For other sliders like cashPaymentDelay
+    else {
+      newSources[index][field] = value;
+    }
+    
     setIngredientSources(prev => ({
       ...prev,
       [ingredientId]: newSources
@@ -825,9 +839,21 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                 label={{ position: 'top' }}
                 activeBar={{fill : "#82ca9d"}}
               >
-                {getTariffData().map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={colorMap[entry.country] || '#ccc'} />
-                ))}
+                {getTariffData().map((entry, index) => {
+                  // Generate vibrant colors based on index
+                  const vibrantColors = [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                    '#9966FF', '#FF9F40', '#2ECC71', '#E74C3C',
+                    '#3498DB', '#F1C40F', '#9B59B6', '#1ABC9C'
+                  ];
+                  
+                  return (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={vibrantColors[index % vibrantColors.length]} 
+                    />
+                  );
+                })}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -837,7 +863,16 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
   )}
 </div>
 
-            <p className="config-text">Configure the ingredients quantities and specifications:</p>
+            {/* 
+              TODO: Future API Integration Requirements:
+              1. Create API endpoints for fetching ingredient specifications
+              2. Add loading state for API data retrieval
+              3. Implement error handling for API failures
+              4. Add caching mechanism for frequently accessed ingredient data
+              5. Create update/patch endpoints for modifying ingredient configurations
+              6. Add validation logic for ingredient percentages and sources
+            */}
+            <p className="config-text">Configure the ingredients quantities and specifications (API-based configuration will be available soon):</p>
             
             <div className="ingredients-list">
               {getIngredients().map(ingredient => (
@@ -927,9 +962,9 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                                 weight: {calculateSourceWeight(ingredient.percentage, source.percentage)}g
                               </span>
 
-                              {/* Tariff Display */}
+                              {/* Tariff Display - Hardcoded to 5% as requested */}
                               <span className="source-tariff">
-                                tariff: {source.country ? getTariffRate(source.country, selectedCountry) : 'N/A'}%
+                                tariff: 5%
                               </span>
 
                               {/* Remove Button */}
@@ -949,6 +984,16 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
 
                         {/* Add Country Button container - reordered buttons */}
                         <div className="add-country-btn-container">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Add graph viewing logic here
+                              console.log('Viewing graph for:', ingredient.name);
+                            }}
+                            className="view-graph-btn"
+                          >
+                            View Graph
+                          </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -984,5 +1029,6 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
     </div>
   );
 };
+
 
 export default WebPage;
