@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Web_page.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { 
+  addCountrySource, 
+  removeCountrySource, 
+  handleSourceCountryChange, 
+  handleSourcePercentageChange, 
+  handleSliderChange,
+  initializeIngredientSources,
+  calculateSourceWeight as computeSourceWeight
+} from './SourceManagement';
+import CountryComparison from './Country_Comparison';
+import IngredientGraph from './IngredientGraph';
 
 const dbName = "TariffDB";
 const storeName = "files";
@@ -173,110 +184,25 @@ const colors = generateColors(countryOptions.length);
 // Step 3: Map each label to a color
 const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, colors[i]]));
 
-  // Initialize ingredient sources when expanded
-  const initializeIngredientSources = (ingredientId) => {
-    if (!ingredientSources[ingredientId]) {
-      setIngredientSources(prev => ({
-        ...prev,
-        [ingredientId]: [{ 
-          country: '', 
-          percentage: 100,
-          supplierAbsorption: 0,
-          manufacturerAbsorption: 100,
-          cashPaymentDelay: 0
-        }]
-      }));
-    }
+  // Using imported functions with state passed in
+  const handleAddCountrySource = (ingredientId) => {
+    addCountrySource(ingredientId, ingredientSources, setIngredientSources);
   };
 
-  // Add country source for an ingredient
-  const addCountrySource = (ingredientId) => {
-    const currentSources = ingredientSources[ingredientId] || [];
-    // Only add if there's room to add more (sum < 100%)
-    const currentTotal = currentSources.reduce((sum, source) => sum + (parseFloat(source.percentage) || 0), 0);
-
-    if (currentTotal < 100) {
-      const newSources = [
-        ...currentSources,
-        { country: '', percentage: 100 - currentTotal, supplierAbsorption: 0, manufacturerAbsorption: 100, cashPaymentDelay: 0 }
-      ];
-      setIngredientSources(prev => ({
-        ...prev,
-        [ingredientId]: newSources
-      }));
-    } else {
-      alert("Total percentage already equals 100%. Adjust existing values before adding more.");
-    }
+  const handleRemoveCountrySource = (ingredientId, index) => {
+    removeCountrySource(ingredientId, index, ingredientSources, setIngredientSources);
   };
 
-  // Remove a country source
-  const removeCountrySource = (ingredientId, index) => {
-    const newSources = [...ingredientSources[ingredientId]];
-    newSources.splice(index, 1);
-
-    // If removing the last source, add one empty source
-    if (newSources.length === 0) {
-      newSources.push({ country: '', percentage: 100, supplierAbsorption: 0, manufacturerAbsorption: 100, cashPaymentDelay: 0 });
-    }
-
-    setIngredientSources(prev => ({
-      ...prev,
-      [ingredientId]: newSources
-    }));
+  const handleCountrySourceChange = (ingredientId, index, country) => {
+    handleSourceCountryChange(ingredientId, index, country, ingredientSources, setIngredientSources);
   };
 
-  // Handle country change for a source
-  const handleSourceCountryChange = (ingredientId, index, country) => {
-    const newSources = [...ingredientSources[ingredientId]];
-    newSources[index].country = country;
-    setIngredientSources(prev => ({
-      ...prev,
-      [ingredientId]: newSources
-    }));
+  const handlePercentageChange = (ingredientId, index, percentage) => {
+    handleSourcePercentageChange(ingredientId, index, percentage, ingredientSources, setIngredientSources);
   };
 
-  // Handle percentage change for a source
-  const handleSourcePercentageChange = (ingredientId, index, percentage) => {
-    const value = Math.min(100, Math.max(0, parseFloat(percentage) || 0));
-    const newSources = [...ingredientSources[ingredientId]];
-    newSources[index].percentage = value;
-
-    setIngredientSources(prev => ({
-      ...prev,
-      [ingredientId]: newSources
-    }));
-  };
-
-  // Handle slider changes
-  const handleSliderChange = (ingredientId, index, field, value) => {
-    const newSources = [...ingredientSources[ingredientId]];
-    
-    // For supplier and manufacturer absorption, maintain sum = 100%
-    if (field === 'supplierAbsorption') {
-      newSources[index][field] = value;
-      newSources[index]['manufacturerAbsorption'] = 100 - value;
-    } 
-    else if (field === 'manufacturerAbsorption') {
-      newSources[index][field] = value;
-      newSources[index]['supplierAbsorption'] = 100 - value;
-    }
-    // For other sliders like cashPaymentDelay
-    else {
-      newSources[index][field] = value;
-    }
-    
-    setIngredientSources(prev => ({
-      ...prev,
-      [ingredientId]: newSources
-    }));
-  };
-
-  // Calculate weight based on ingredient percentage and source percentage
-  const calculateSourceWeight = (ingredientPercentage, sourcePercentage) => {
-    const baseWeight = (ingredientPercentage * totalQuantity / 100);
-    const multiplier = selectedType ? parseFloat(selectedType) : 1;
-    const sourceWeight = (baseWeight * (sourcePercentage / 100) * multiplier).toFixed(2);
-    return sourceWeight;
+  const handleSourceSliderChange = (ingredientId, index, field, value) => {
+    handleSliderChange(ingredientId, index, field, value, ingredientSources, setIngredientSources);
   };
 
   const handleSignOut = () => {
@@ -316,23 +242,29 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
         request.onsuccess = () => {
           const files = request.result;
           const supplyFiles = files.filter(file => file.fileType === 'supplyChain');
+          const productFiles = files.filter(file => file.fileType === 'product');
           
-          if (supplyFiles.length > 0) {
-            const latestFile = supplyFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+          if (supplyFiles.length > 0 && productFiles.length > 0) {
+            const latestSupplyFile = supplyFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            const latestProductFile = productFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
             
-            // Get relevant column indices
-            const rawMaterialIndex = latestFile.headers.indexOf('Raw_Material_Name');
-            const exportCountryIndex = latestFile.headers.indexOf('Export_Country');
-            const importCountryIndex = latestFile.headers.indexOf('Import_country');
-            const tariffIndex = latestFile.headers.indexOf('Tariffs');
-            const contractDateIndex = latestFile.headers.indexOf('contract_end_date');
-            const productSubCategoryIndex = latestFile.headers.indexOf('Product_Sub_Category');
+            // Get relevant column indices from supply chain file
+            const rawMaterialIndex = latestSupplyFile.headers.indexOf('Raw_Material_Name');
+            const exportCountryIndex = latestSupplyFile.headers.indexOf('Export_Country');
+            const importCountryIndex = latestSupplyFile.headers.indexOf('Import_country');
+            const tariffIndex = latestSupplyFile.headers.indexOf('Tariffs');
+            const contractDateIndex = latestSupplyFile.headers.indexOf('contract_end_date');
+            const productSubCategoryIndex = latestSupplyFile.headers.indexOf('Product_Sub_Category');
+            
+            // Get Product_percent_requied column index from product file
+            const productRawMaterialIndex = latestProductFile.headers.indexOf('Raw_Material_Name');
+            const percentRequiredIndex = latestProductFile.headers.indexOf('Product_percent_requied');
             
             if (rawMaterialIndex !== -1 && exportCountryIndex !== -1 && importCountryIndex !== -1 && 
                 tariffIndex !== -1 && contractDateIndex !== -1 && productSubCategoryIndex !== -1) {
               
               // Filter rows by selected country and product
-              const filteredRows = latestFile.rows.filter(row => 
+              const filteredRows = latestSupplyFile.rows.filter(row => 
                 row[importCountryIndex] === selectedCountry && 
                 row[productSubCategoryIndex] === selectedProduct
               );
@@ -363,31 +295,55 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                   
                   // Build product raw materials data
                   if (!rawMaterials[rawMaterialName]) {
-                    // Extract percentage if available or default to equal distribution
-                    const basePrice = parseFloat(row[latestFile.headers.indexOf('Base_Price_Per_Unit')]) || 0;
-                    rawMaterials[rawMaterialName] = { name: rawMaterialName, percentage: 0, basePrice: basePrice };
+                    // Get percentage from product file if available
+                    let materialPercentage = 0;
+                    
+                    if (productRawMaterialIndex !== -1 && percentRequiredIndex !== -1) {
+                      // Find the matching row in product file
+                      const productRow = latestProductFile.rows.find(pRow => 
+                        pRow[productRawMaterialIndex] === rawMaterialName
+                      );
+                      
+                      if (productRow && productRow[percentRequiredIndex]) {
+                        materialPercentage = parseFloat(productRow[percentRequiredIndex]) || 0;
+                      }
+                    }
+                    
+                    // Extract base price from supply chain file
+                    const basePrice = parseFloat(row[latestSupplyFile.headers.indexOf('Base_Price_Per_Unit')]) || 0;
+                    rawMaterials[rawMaterialName] = { 
+                      name: rawMaterialName, 
+                      percentage: materialPercentage,
+                      basePrice: basePrice 
+                    };
                   }
                 }
               });
               
-              // Calculate percentages for materials if not explicitly given
+              // If no percentages were found in Product_percent_requied, distribute equally
               const materialCount = Object.keys(rawMaterials).length;
-              if (materialCount > 0) {
+              let totalPercentage = 0;
+              
+              Object.keys(rawMaterials).forEach(key => {
+                totalPercentage += rawMaterials[key].percentage;
+              });
+              
+              // If total percentage is 0, distribute equally
+              if (totalPercentage === 0 && materialCount > 0) {
                 const equalPercentage = 100 / materialCount;
                 Object.keys(rawMaterials).forEach(key => {
                   rawMaterials[key].percentage = equalPercentage;
                 });
-                
-                // Create product raw materials structure
-                const newProductRawMaterials = {
-                  [selectedCategory]: {
-                    [selectedProduct]: Object.values(rawMaterials)
-                  }
-                };
-                
-                setProductRawMaterials(newProductRawMaterials);
               }
               
+              // Create product raw materials structure
+              const newProductRawMaterials = {
+                [selectedCategory]: {
+                  [selectedProduct]: Object.values(rawMaterials)
+                }
+              };
+              
+              setProductRawMaterials(newProductRawMaterials);
               setRawMaterialTariffData(tariffData);
             }
           }
@@ -421,14 +377,30 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
       setExpandedIngredient(null);
     } else {
       setExpandedIngredient(id);
-      initializeIngredientSources(id);
+      // Check if sources already exist, if not, fetch them
+      if (!ingredientSources[id]) {
+        fetchIngredientSources(id);
+      }
     }
   };
 
+  // Update weight calculation to interpret units as tons (1 unit = 1 ton = 1000kg)
   const calculateIngredientWeight = (percentage) => {
-    const baseWeight = (percentage * totalQuantity / 100);
-    const multiplier = selectedType ? parseFloat(selectedType) : 1;
-    return (baseWeight * multiplier).toFixed(2);
+    // Convert percentage to decimal (e.g., 10% -> 0.1)
+    const percentDecimal = percentage / 100;
+    // If selectedType is 1, it means 1 ton (1000kg)
+    const multiplier = selectedType ? parseFloat(selectedType) : 0;
+    // Calculate weight in kg (percentage of the total tons, converted to kg)
+    return (percentDecimal * multiplier * 1000).toFixed(1);
+  };
+  
+  // Fix the recursive function call by renaming the local function
+  // and using the renamed imported function but adjusted for tons
+  const calculateSourceWeight = (ingredientPercentage, sourcePercentage) => {
+    // First calculate the total ingredient weight in kg
+    const ingredientWeight = calculateIngredientWeight(ingredientPercentage);
+    // Then calculate the source's portion of that weight
+    return ((sourcePercentage / 100) * ingredientWeight).toFixed(1);
   };
 
   // Update category selection handler
@@ -642,6 +614,99 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
     }
   }, [selectedCountry]);
 
+  // Add states for ingredient graph modal
+  const [isIngredientGraphOpen, setIsIngredientGraphOpen] = useState(false);
+  const [selectedIngredientForGraph, setSelectedIngredientForGraph] = useState(null);
+
+  // Handle View Graph button click
+  const handleViewGraph = (ingredientName, e) => {
+    e.stopPropagation(); // Prevent toggling the ingredient
+    setSelectedIngredientForGraph(ingredientName);
+    setIsIngredientGraphOpen(true);
+  };
+
+  // Close ingredient graph modal
+  const closeIngredientGraph = () => {
+    setIsIngredientGraphOpen(false);
+    setSelectedIngredientForGraph(null);
+  };
+
+  // New function to fetch ingredient sources from product table
+  const fetchIngredientSources = async (ingredientName) => {
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const productFiles = files.filter(file => file.fileType === 'product');
+          
+          if (productFiles.length > 0) {
+            const latestFile = productFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            const rawMaterialIndex = latestFile.headers.indexOf('Raw_Material_Name');
+            const fromCountryIndex = latestFile.headers.indexOf('From_Country');
+            const percentRequiredIndex = latestFile.headers.indexOf('Product_percent_requied');
+            
+            if (rawMaterialIndex !== -1 && fromCountryIndex !== -1) {
+              // Filter rows by ingredient name
+              const ingredientRows = latestFile.rows.filter(row => 
+                row[rawMaterialIndex] === ingredientName
+              );
+              
+              // Get unique source countries
+              const sourceCountries = [...new Set(ingredientRows.map(row => row[fromCountryIndex]))].filter(Boolean);
+              
+              if (sourceCountries.length > 0) {
+                // Get ingredient percentage from the Product_percent_requied column if available
+                let ingredientPercentage = 100; // Default
+                
+                if (percentRequiredIndex !== -1) {
+                  // Find the first valid percentage for this ingredient
+                  const percentRow = ingredientRows.find(row => row[percentRequiredIndex] && !isNaN(parseFloat(row[percentRequiredIndex])));
+                  if (percentRow) {
+                    ingredientPercentage = parseFloat(percentRow[percentRequiredIndex]);
+                  }
+                }
+                
+                // Calculate equal distribution of the ingredient percentage for each country source
+                const equalPercentage = Math.floor(100 / sourceCountries.length);
+                const remainder = 100 - (equalPercentage * sourceCountries.length);
+                
+                // Create sources array
+                const sources = sourceCountries.map((country, index) => ({
+                  country,
+                  // Add the remainder to the first country
+                  percentage: index === 0 ? equalPercentage + remainder : equalPercentage,
+                  supplierAbsorption: 0,
+                  manufacturerAbsorption: 100,
+                  cashPaymentDelay: 0
+                }));
+                
+                // Update ingredient sources
+                setIngredientSources(prev => ({
+                  ...prev,
+                  [ingredientName]: sources
+                }));
+              } else {
+                // Fall back to default initialization if no sources found
+                initializeIngredientSources(ingredientName, ingredientSources, setIngredientSources);
+              }
+            }
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error fetching ingredient sources:', error);
+      // Fall back to default initialization on error
+      initializeIngredientSources(ingredientName, ingredientSources, setIngredientSources);
+    }
+  };
+
   return (
     <div className="tariff-simulator">
       <div className="header">
@@ -797,82 +862,11 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
           <div className="ingredients-container">
             <h2>Raw Materials for {selectedProduct}</h2>
             
-            {/* Tariff graph section */}
-            <div className="tariff-graph-container">
-  <div className="graph-header" onClick={() => setIsChartExpanded(!isChartExpanded)}>
-    <h3>Tariff on Raw Materials (Country Comparison)</h3>
-    <span className="expand-icon">
-      {isChartExpanded ? '▼' : '▶'}
-    </span>
-  </div>
-  
-  {isChartExpanded && (
-    <>
-      <div className="graph-controls">
-        <select
-          value={selectedRawMaterial}
-          onChange={handleRawMaterialChange}
-          className="raw-material-select"
-        >
-          <option value="">Select Raw Material</option>
-          {getRawMaterialOptions().map(material => (
-            <option key={material} value={material}>{material}</option>
-          ))}
-        </select>
-      </div>
-      
-      {selectedRawMaterial && (
-        <div className="graph-wrapper">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={getTariffData()}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="country" />
-              <YAxis label={{ value: 'Tariff Rate (%)', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Bar 
-                dataKey="tariff" 
-                barSize={30}
-                name={`${selectedRawMaterial} Tariff`} 
-                label={{ position: 'top' }}
-                activeBar={{fill : "#82ca9d"}}
-              >
-                {getTariffData().map((entry, index) => {
-                  // Generate vibrant colors based on index
-                  const vibrantColors = [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-                    '#9966FF', '#FF9F40', '#2ECC71', '#E74C3C',
-                    '#3498DB', '#F1C40F', '#9B59B6', '#1ABC9C'
-                  ];
-                  
-                  return (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={vibrantColors[index % vibrantColors.length]} 
-                    />
-                  );
-                })}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-    </>
-  )}
-</div>
+            {/* Replace the chart code with our new component */}
+            <CountryComparison rawMaterialTariffData={rawMaterialTariffData} />
 
-            {/* 
-              TODO: Future API Integration Requirements:
-              1. Create API endpoints for fetching ingredient specifications
-              2. Add loading state for API data retrieval
-              3. Implement error handling for API failures
-              4. Add caching mechanism for frequently accessed ingredient data
-              5. Create update/patch endpoints for modifying ingredient configurations
-              6. Add validation logic for ingredient percentages and sources
-            */}
-            <p className="config-text">Configure the ingredients quantities and specifications (API-based configuration will be available soon):</p>
+
+            <p className="config-text">Configure the ingredients quantities and specifications (source countries auto-populated from data):</p>
             
             <div className="ingredients-list">
               {getIngredients().map(ingredient => (
@@ -881,7 +875,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                     <div className="ingredient-info" style={{ display: 'flex', gap: '20px' }}>
                       <div className="ingredient-name">{ingredient.name}</div>
                       <div className="ingredient-percentage">percent: {ingredient.percentage}%</div>
-                      <div className="ingredient-weight">weight: {calculateIngredientWeight(ingredient.percentage)}g</div>
+                      <div className="ingredient-weight">weight: {calculateIngredientWeight(ingredient.percentage)}kg</div>
                     </div>
                     <div className="expand-icon">
                       {expandedIngredient === ingredient.name ? '▼' : '▶'}
@@ -900,7 +894,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                               <select
                                 className="source-select"
                                 value={source.country}
-                                onChange={(e) => handleSourceCountryChange(ingredient.name, index, e.target.value)}
+                                onChange={(e) => handleCountrySourceChange(ingredient.name, index, e.target.value)}
                               >
                                 <option value="">Select Country</option>
                                 {sourceCountryOptions.map(country => (
@@ -916,7 +910,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                                     min="0"
                                     max="100"
                                     value={source.supplierAbsorption || 0}
-                                    onChange={(e) => handleSliderChange(ingredient.name, index, 'supplierAbsorption', parseInt(e.target.value))}
+                                    onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'supplierAbsorption', parseInt(e.target.value))}
                                   />
                                   <span>{source.supplierAbsorption || 0}%</span>
                                 </div>
@@ -928,7 +922,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                                     min="0"
                                     max="100"
                                     value={source.manufacturerAbsorption || 0}
-                                    onChange={(e) => handleSliderChange(ingredient.name, index, 'manufacturerAbsorption', parseInt(e.target.value))}
+                                    onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'manufacturerAbsorption', parseInt(e.target.value))}
                                   />
                                   <span>{source.manufacturerAbsorption || 0}%</span>
                                 </div>  
@@ -940,7 +934,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                                     min="0"
                                     max="90"
                                     value={source.cashPaymentDelay || 0}
-                                    onChange={(e) => handleSliderChange(ingredient.name, index, 'cashPaymentDelay', parseInt(e.target.value))}
+                                    onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'cashPaymentDelay', parseInt(e.target.value))}
                                   />
                                   <span>{source.cashPaymentDelay || 0} days</span>
                                 </div>
@@ -950,28 +944,28 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                               <input
                                 type="number"
                                 value={source.percentage}
-                                onChange={(e) => handleSourcePercentageChange(ingredient.name, index, e.target.value)}
+                                onChange={(e) => handlePercentageChange(ingredient.name, index, e.target.value)}
                                 min="0"
                                 max="100"
                                 placeholder="%"
                                 className="source-percentage-input"
                               />
 
-                              {/* Weight Display */}
+                              {/* Weight Display - Updated to read directly from new function */}
                               <span className="source-weight">
-                                weight: {calculateSourceWeight(ingredient.percentage, source.percentage)}g
+                                weight: {calculateSourceWeight(ingredient.percentage, source.percentage)}kg
                               </span>
 
-                              {/* Tariff Display - Hardcoded to 5% as requested */}
+                              {/* Tariff Display - Using actual tariff from product table */}
                               <span className="source-tariff">
-                                tariff: 5%
+                                tariff: {getTariffRate(source.country, selectedCountry)}%
                               </span>
 
                               {/* Remove Button */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation(); // Prevent toggling the ingredient
-                                  removeCountrySource(ingredient.name, index);
+                                  handleRemoveCountrySource(ingredient.name, index);
                                 }}
                                 className="remove-source-btn"
                                 disabled={ingredientSources[ingredient.name]?.length <= 1}
@@ -985,11 +979,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                         {/* Add Country Button container - reordered buttons */}
                         <div className="add-country-btn-container">
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Add graph viewing logic here
-                              console.log('Viewing graph for:', ingredient.name);
-                            }}
+                            onClick={(e) => handleViewGraph(ingredient.name, e)}
                             className="view-graph-btn"
                           >
                             View Graph
@@ -1007,7 +997,7 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              addCountrySource(ingredient.name);
+                              handleAddCountrySource(ingredient.name);
                             }}
                             className="add-country-btn"
                           >
@@ -1026,6 +1016,20 @@ const colorMap = Object.fromEntries(countryOptions.map((label, i) => [label, col
           </div>
         </>
       )}
+
+      {/* Add ingredient graph modal */}
+      <IngredientGraph
+        isOpen={isIngredientGraphOpen}
+        onClose={closeIngredientGraph}
+        ingredientName={selectedIngredientForGraph}
+        sources={selectedIngredientForGraph ? ingredientSources[selectedIngredientForGraph] : []}
+        tariffData={tariffData}
+        selectedCountry={selectedCountry}
+        basePrice={selectedIngredientForGraph ? 
+          getIngredients().find(item => item.name === selectedIngredientForGraph)?.basePrice || 0 
+          : 0
+        }
+      />
     </div>
   );
 };

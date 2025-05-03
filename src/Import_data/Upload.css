@@ -386,6 +386,7 @@
 .action-buttons {
     display: flex;
     gap: 8px;
+    min-width: 200px;
 }
 
 .preview-btn {
@@ -473,4 +474,55 @@
 .modal-body {
   max-height: calc(80vh - 100px);
   overflow-y: auto;
+}
+
+.process-btn {
+    padding: 6px 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.process-btn:hover {
+    background-color: #2980b9;
+}
+
+.process-btn:disabled {
+    background-color: #cbd5e0;
+    cursor: not-allowed;
+}
+
+.processing-indicator {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    text-align: center;
+    margin-top: 10px;
+    color: #495057;
+}
+
+.api-response {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow: auto;
+    max-height: 200px;
+}
+
+.api-response h3 {
+    margin-top: 0;
+    color: #212529;
+    font-size: 16px;
+}
+
+.api-response pre {
+    margin: 0;
+    font-size: 13px;
+    white-space: pre-wrap;
 }

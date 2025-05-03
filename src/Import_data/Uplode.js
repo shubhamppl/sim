@@ -6,6 +6,9 @@ import * as XLSX from 'xlsx';
 const dbName = "TariffDB";
 const storeName = "files";
 
+// Backend API URL
+const API_URL = "http://localhost:8000";
+
 const initDB = async () => {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(dbName, 1);
@@ -34,6 +37,8 @@ const Upload = () => {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [productFile, setProductFile] = useState(null);
   const [fileType, setFileType] = useState(''); // 'supply' or 'product'
+  const [apiResponse, setApiResponse] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     loadSavedFiles();
@@ -124,6 +129,7 @@ const Upload = () => {
     const fileToUpload = fileType === 'supply' ? supplyChainFile : productFile;
     if (fileToUpload) {
       try {
+        setIsProcessing(true);
         const db = await initDB();
         const newFileId = `${fileType === 'supply' ? 'S' : 'P'}${savedFiles.length + 1}`.padStart(3, '0');
         
@@ -143,12 +149,78 @@ const Upload = () => {
         setUploadStatus(`File uploaded successfully! Saved with ID: ${newFileId}`);
         await loadSavedFiles();
         
+        // If it's a supply chain file, also send it to the backend API
+        if (fileType === 'supply') {
+          await sendToBackend(fileData);
+        }
+
         fileType === 'supply' ? setSupplyChainFile(null) : setProductFile(null);
         setHeaders([]);
         setRows([]);
       } catch (error) {
         setUploadStatus('Error saving file: ' + error.message);
+      } finally {
+        setIsProcessing(false);
       }
+    }
+  };
+
+  // Function to send data to backend API
+  const sendToBackend = async (fileData) => {
+    try {
+      const response = await fetch(`${API_URL}/process-supply-data/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          headers: fileData.headers,
+          rows: fileData.rows
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setApiResponse(result);
+      
+      if (result.success) {
+        setUploadStatus(prevStatus => `${prevStatus} - ${result.message}`);
+      } else {
+        setUploadStatus(prevStatus => `${prevStatus} - API Error: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Error sending data to backend:', error);
+      setUploadStatus(prevStatus => `${prevStatus} - Failed to connect to backend: ${error.message}`);
+    }
+  };
+
+  // Function to send a file to the backend for processing
+  const processWithBackend = async (fileId) => {
+    try {
+      setIsProcessing(true);
+      
+      const db = await initDB();
+      const transaction = db.transaction(storeName, "readonly");
+      const store = transaction.objectStore(storeName);
+      const request = store.get(fileId);
+      
+      request.onsuccess = async () => {
+        const fileData = request.result;
+        
+        if (fileData && fileData.fileType === 'supplyChain') {
+          await sendToBackend(fileData);
+          setUploadStatus(`File ${fileId} sent to backend for processing`);
+        } else {
+          setUploadStatus('Only supply chain files can be processed with the backend');
+        }
+      };
+    } catch (error) {
+      setUploadStatus('Error processing with backend: ' + error.message);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -202,6 +274,55 @@ const Upload = () => {
   const handleBack = () => {
     navigate('/dashboard');
   };
+
+  // Modify the saved files table to add "Process" button
+  const renderSupplyChainFiles = () => (
+    <>
+      <div className='section-title'>Saved Supply Chain Files</div>
+      <div className="saved-files-list">
+        <table className="saved-files-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>File Name</th>
+              <th>Upload Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {savedFiles.filter(file => file.fileType === 'supplyChain').map((savedFile) => (
+              <tr key={savedFile.id}>
+                <td>{savedFile.id}</td>
+                <td>{savedFile.fileName}</td>
+                <td>{new Date(savedFile.uploadDate).toLocaleDateString()}</td>
+                <td className="action-buttons">
+                  <button 
+                    className="preview-btn"
+                    onClick={() => handlePreview(savedFile.id)}
+                  >
+                    Preview
+                  </button>
+                  <button 
+                    className="process-btn"
+                    onClick={() => processWithBackend(savedFile.id)}
+                    disabled={isProcessing}
+                  >
+                    Process
+                  </button>
+                  <button 
+                    className="delete-btn"
+                    onClick={() => handleDelete(savedFile.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
 
   return (
     <div className="upload-page">
@@ -328,47 +449,21 @@ const Upload = () => {
                   {uploadStatus}
                 </div>
               )}
+              {isProcessing && (
+                <div className="processing-indicator">
+                  Processing data, please wait...
+                </div>
+              )}
+              {apiResponse && (
+                <div className="api-response">
+                  <h3>Backend Processing Result</h3>
+                  <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
+                </div>
+              )}
             </div>
 
-            {/* Saved Files Sections */}
             <div className="saved-files-section">
-              <div className='section-title'>Saved Supply Chain Files</div>
-              <div className="saved-files-list">
-                <table className="saved-files-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>File Name</th>
-                      <th>Upload Date</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {/* View Supply Chain Table - Displays all saved supply chain files */}
-                    {savedFiles.filter(file => file.fileType === 'supplyChain').map((savedFile) => (
-                      <tr key={savedFile.id}>
-                        <td>{savedFile.id}</td>
-                        <td>{savedFile.fileName}</td>
-                        <td>{new Date(savedFile.uploadDate).toLocaleDateString()}</td>
-                        <td className="action-buttons">
-                          <button 
-                            className="preview-btn"
-                            onClick={() => handlePreview(savedFile.id)}
-                          >
-                            Preview
-                          </button>
-                          <button 
-                            className="delete-btn"
-                            onClick={() => handleDelete(savedFile.id)}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {renderSupplyChainFiles()}
             </div>
 
             <div className="saved-files-section">
