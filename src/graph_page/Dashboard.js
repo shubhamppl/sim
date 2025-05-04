@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import TariffChart from './TariffChart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Dashboard.css';
+import TariffSidebar from './TariffSidebar';
+// Import loadUpdatedSupplyTable from SourceManagement
+import { loadUpdatedSupplyTable } from '../Main_page/SourceManagement';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -320,6 +323,30 @@ const Dashboard = () => {
     }));
   };
 
+  // Add handlers for table buttons
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({ headers: [], rows: [], title: '' });
+
+  const handleShowUpdatedTable = () => {
+    // Use the imported function with the necessary parameters
+    loadUpdatedSupplyTable(
+      country,
+      product,
+      "TariffDB",
+      "files",
+      setModalData,
+      setIsTableModalOpen
+    );
+  };
+
+  const handleShowProductTable = () => {
+    alert('View Product Table functionality will be implemented here');
+  };
+
+  const handleShowSupplyTable = () => {
+    alert('View Supply Table functionality will be implemented here');
+  };
+
   return (
     <div>
       <div className="tariff-header">
@@ -338,163 +365,16 @@ const Dashboard = () => {
       </div>
       
       <div className="tariff-container">
-        <aside className="tariff-sidebar">
-          <div>Tariff Simulator</div>
-          <p>Analyze tariff impacts on your business</p>
-
-          <div className="tariff-form">
-            <div>
-              <label>Country</label>
-              <input 
-                type="text" 
-                value={country}
-                disabled
-                className="tariff-input-disabled"
-              />
-            </div>
-
-            <div>
-              <label>Product Category</label>
-              <input 
-                type="text" 
-                value={category}
-                disabled
-                className="tariff-input-disabled"
-              />
-            </div>
-
-            <div>
-              <label>Product</label>
-              <input 
-                type="text" 
-                value={product}
-                disabled
-                className="tariff-input-disabled"
-              />
-            </div>
-
-            <div>
-              <label>Quantity</label>
-              <input 
-                type="number" 
-                value={quantity}
-                disabled
-                className="tariff-input-disabled"
-              />
-            </div>
-
-            <div className="ingredient-config-section">
-              <button 
-                className="ingredient-config-toggle" 
-                onClick={() => {
-                  console.log("Toggling ingredient panel, current state:", !showIngredientConfig);
-                  console.log("Available ingredients:", ingredients);
-                  setShowIngredientConfig(!showIngredientConfig);
-                }}
-              >
-                {showIngredientConfig ? 'Hide Ingredients' : 'Configure Ingredients'}
-              </button>
-              
-              {showIngredientConfig && ingredients.length > 0 ? (
-                <div className="ingredients-panel">
-                  <p className="config-text">Configure the ingredients quantities and specifications:</p>
-
-                  <div className="ingredients-list-sidebar">
-                    {ingredients.map(ingredient => (
-                      <div key={ingredient.id} className="ingredient-item-sidebar">
-                        <div 
-                          className="ingredient-row-sidebar" 
-                          onClick={() => toggleIngredient(ingredient.id)}
-                        >
-                          <div className="ingredient-name-sidebar">{ingredient.name}</div>
-                          <div className="ingredient-details-sidebar">
-                            <span>{ingredient.percentage}%</span>
-                            <span>{calculateIngredientWeight(ingredient.percentage)}g</span>
-                            <span>{expandedIngredient === ingredient.id ? '▼' : '▶'}</span>
-                          </div>
-                        </div>
-
-                        {expandedIngredient === ingredient.id && (
-                          <div className="ingredient-expanded-sidebar">
-                            {ingredientSources[ingredient.name]?.map((source, index) => (
-                              <div key={index} className="source-row-sidebar">
-                                <select
-                                  className="source-select-sidebar"
-                                  value={source.country}
-                                  onChange={(e) => handleSourceCountryChange(ingredient.name, index, e.target.value)}
-                                  disabled={true} // Disable editing in results view
-                                >
-                                  <option value={source.country}>{source.country || "No country selected"}</option>
-                                </select>
-                                
-                                <div className="source-inputs-sidebar">
-                                  <div className="source-input-group">
-                                    <input
-                                      type="number"
-                                      value={source.percentage}
-                                      disabled={true} // Disable editing in results view
-                                      className="source-percentage-input-sidebar"
-                                    />
-                                    <span>%</span>
-                                  </div>
-                                  
-                                  <div className="source-weight-sidebar">
-                                    {calculateSourceWeight(ingredient.percentage, source.percentage)}g
-                                  </div>
-                                </div>
-
-                                <div className="sliders-sidebar">
-                                  <div className="slider-group-sidebar">
-                                    <label>Supplier: {source.supplierAbsorption}%</label>
-                                    <input
-                                      type="range"
-                                      min="0"
-                                      max="100"
-                                      value={source.supplierAbsorption || 0}
-                                      disabled={true} // Disable editing in results view
-                                    />
-                                  </div>
-                                  
-                                  <div className="slider-group-sidebar">
-                                    <label>Manufacturer: {source.manufacturerAbsorption}%</label>
-                                    <input
-                                      type="range"
-                                      min="0"
-                                      max="100"
-                                      value={source.manufacturerAbsorption || 0}
-                                      disabled={true} // Disable editing in results view
-                                    />
-                                  </div>
-                                  
-                                  <div className="slider-group-sidebar">
-                                    <label>Payment Delay: {source.cashPaymentDelay} days</label>
-                                    <input
-                                      type="range"
-                                      min="0"
-                                      max="90"
-                                      value={source.cashPaymentDelay || 0}
-                                      disabled={true} // Disable editing in results view
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : showIngredientConfig ? (
-                <div className="ingredients-panel">
-                  <p className="config-text">No ingredients available for this product.</p>
-                </div>
-              ) : null}
-            </div>
-
-            <button onClick={handleBackClick} className="simulate-button">Back to Simulator</button>
-          </div>
-        </aside>
+        <TariffSidebar 
+          country={country}
+          category={category}
+          product={product}
+          quantity={quantity}
+          showIngredientConfig={showIngredientConfig}
+          setShowIngredientConfig={setShowIngredientConfig}
+          ingredients={ingredients}
+          handleBackClick={handleBackClick}
+        />
 
         <main className="tariff-main">
           <section className="tariff-stats">
@@ -553,6 +433,40 @@ const Dashboard = () => {
           </section>
         </main>
       </div>
+
+      {/* Add table modal */}
+      {isTableModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>{modalData.title}</h2>
+              <button className="close-modal" onClick={() => setIsTableModalOpen(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div className="table-container">
+                <table className="preview-table">
+                  <thead>
+                    <tr>
+                      {modalData.headers.map((header, index) => (
+                        <th key={index}>{header}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {modalData.rows.map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {row.map((cell, cellIndex) => (
+                          <td key={cellIndex}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
