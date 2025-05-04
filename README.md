@@ -137,6 +137,22 @@ Core simulator interface components:
    ```
    npm start
    ```
+
+  others:
+npx create-react-app sim
+# OR with Vite (recommended)
+npm create vite@latest sim -- --template react
+
+npm install -D vite sass @types/react @types/react-dom
+
+npm install chart.js react-chartjs-2
+# OR
+npm install recharts
+
+npm install react-redux @reduxjs/toolkit
+# OR
+npm install zustand
+npm install react react-dom react-router-dom
 4. Open http://localhost:3000 to view the application
 
 ### Available Scripts
