@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Dashboard.css';
-import { loadUpdatedSupplyTable } from '../Main_page/SourceManagement';
+import IngredientList from '../Main_page/IngredientList';
 
 const TariffSidebar = ({ 
   country, 
@@ -14,6 +14,66 @@ const TariffSidebar = ({
 }) => {
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ headers: [], rows: [], title: '' });
+
+  // Add the loadUpdatedSupplyTable function that was previously imported from SourceManagement.js
+  const loadUpdatedSupplyTable = async (
+    selectedCountry,
+    selectedProduct,
+    dbName,
+    storeName,
+    setModalData,
+    setIsTableModalOpen
+  ) => {
+    if (!selectedCountry || !selectedProduct) {
+      alert('Please select a country and product first.');
+      return;
+    }
+    
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const supplyFiles = files.filter(file => file.fileType === 'supplyChain');
+          
+          if (supplyFiles.length > 0) {
+            const latestFile = supplyFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            // Get column indices
+            const importCountryIndex = latestFile.headers.indexOf('Import_country');
+            const productSubCategoryIndex = latestFile.headers.indexOf('Product_Sub_Category');
+            
+            if (importCountryIndex !== -1 && productSubCategoryIndex !== -1) {
+              // Filter rows based on selection
+              const filteredRows = latestFile.rows.filter(row => 
+                row[importCountryIndex] === selectedCountry && 
+                row[productSubCategoryIndex] === selectedProduct
+              );
+              
+              setModalData({
+                headers: latestFile.headers,
+                rows: filteredRows,
+                title: 'Updated Supply Chain Data for ' + selectedProduct + ' in ' + selectedCountry
+              });
+              setIsTableModalOpen(true);
+            } else {
+              alert('Could not find required columns in the supply chain data.');
+            }
+          } else {
+            alert('No supply chain data available. Please upload a file first.');
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading updated supply data:', error);
+      alert('Error loading data. Please try again.');
+    }
+  };
 
   const handleShowUpdatedTable = () => {
     loadUpdatedSupplyTable(

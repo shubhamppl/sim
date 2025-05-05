@@ -36,6 +36,205 @@ const IngredientList = ({
   // New state to store tariffs by ingredient and country
   const [countryTariffRates, setCountryTariffRates] = useState({});
 
+  /**
+   * Add a new country source to an ingredient
+   * @param {string} ingredientId - ID/name of the ingredient
+   * @returns {object|null} - The newly added source or null if not added
+   */
+  const addCountrySource = (ingredientId) => {
+    const currentSources = ingredientSources[ingredientId] || [];
+    // Only add if there's room to add more (sum < 100%)
+    const currentTotal = currentSources.reduce((sum, source) => sum + (parseFloat(source.percentage) || 0), 0);
+
+    if (currentTotal < 100) {
+      const newSource = { 
+        country: '', 
+        percentage: 100 - currentTotal, 
+        supplierAbsorption: 0, 
+        manufacturerAbsorption: 100, 
+        cashPaymentDelay: 0,
+        basePrice: 0 // Add basePrice field
+      };
+      
+      const newSources = [...currentSources, newSource];
+      
+      setIngredientSources(prev => ({
+        ...prev,
+        [ingredientId]: newSources
+      }));
+      
+      return newSource;
+    } else {
+      alert("Total percentage already equals 100%. Adjust existing values before adding more.");
+      return null;
+    }
+  };
+
+  /**
+   * Remove a country source from an ingredient
+   * @param {string} ingredientId - ID/name of the ingredient
+   * @param {number} index - Index of the source to remove
+   */
+  const removeCountrySource = (ingredientId, index) => {
+    const newSources = [...ingredientSources[ingredientId]];
+    newSources.splice(index, 1);
+
+    // If removing the last source, add one empty source
+    if (newSources.length === 0) {
+      newSources.push({ country: '', percentage: 100, supplierAbsorption: 0, manufacturerAbsorption: 100, cashPaymentDelay: 0 });
+    }
+
+    setIngredientSources(prev => ({
+      ...prev,
+      [ingredientId]: newSources
+    }));
+  };
+
+  /**
+   * Handle country change for a source
+   * @param {string} ingredientId - ID/name of the ingredient
+   * @param {number} index - Index of the source to update
+   * @param {string} country - New country value
+   */
+  const localHandleSourceCountryChange = (ingredientId, index, country) => {
+    const newSources = [...ingredientSources[ingredientId]];
+    newSources[index].country = country;
+    setIngredientSources(prev => ({
+      ...prev,
+      [ingredientId]: newSources
+    }));
+  };
+
+  /**
+   * Handle percentage change for a source
+   * @param {string} ingredientId - ID/name of the ingredient
+   * @param {number} index - Index of the source to update
+   * @param {number} percentage - New percentage value
+   */
+  const localHandleSourcePercentageChange = (ingredientId, index, percentage) => {
+    const value = Math.min(100, Math.max(0, parseFloat(percentage) || 0));
+    const newSources = [...ingredientSources[ingredientId]];
+    newSources[index].percentage = value;
+
+    setIngredientSources(prev => ({
+      ...prev,
+      [ingredientId]: newSources
+    }));
+  };
+
+  /**
+   * Handle slider changes for a source
+   * @param {string} ingredientId - ID/name of the ingredient
+   * @param {number} index - Index of the source to update
+   * @param {string} field - Field to update (e.g., 'supplierAbsorption')
+   * @param {number} value - New value for the field
+   */
+  const localHandleSliderChange = (ingredientId, index, field, value) => {
+    const newSources = [...ingredientSources[ingredientId]];
+    
+    // For supplier and manufacturer absorption, maintain sum = 100%
+    if (field === 'supplierAbsorption') {
+      newSources[index][field] = value;
+      newSources[index]['manufacturerAbsorption'] = 100 - value;
+    } 
+    else if (field === 'manufacturerAbsorption') {
+      newSources[index][field] = value;
+      newSources[index]['supplierAbsorption'] = 100 - value;
+    }
+    // For other sliders like cashPaymentDelay
+    else {
+      newSources[index][field] = value;
+    }
+    
+    setIngredientSources(prev => ({
+      ...prev,
+      [ingredientId]: newSources
+    }));
+  };
+
+  /**
+   * Initialize sources for an ingredient if not already initialized
+   * @param {string} ingredientId - ID/name of the ingredient
+   */
+  const initializeIngredientSources = (ingredientId) => {
+    if (!ingredientSources[ingredientId]) {
+      setIngredientSources(prev => ({
+        ...prev,
+        [ingredientId]: [{ 
+          country: '', 
+          percentage: 100,
+          supplierAbsorption: 0,
+          manufacturerAbsorption: 100,
+          cashPaymentDelay: 0
+        }]
+      }));
+    }
+  };
+
+  /**
+   * Load and display updated supply chain data filtered by country and product
+   * @param {string} selectedCountry - Currently selected country
+   * @param {string} selectedProduct - Currently selected product
+   * @param {function} setModalData - Function to set modal data
+   * @param {function} setIsTableModalOpen - Function to open modal
+   */
+  const loadUpdatedSupplyTable = async (
+    selectedCountry,
+    selectedProduct,
+    setModalData,
+    setIsTableModalOpen
+  ) => {
+    if (!selectedCountry || !selectedProduct) {
+      alert('Please select a country and product first.');
+      return;
+    }
+    
+    try {
+      const db = await indexedDB.open(dbName, 1);
+      db.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(storeName, "readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const files = request.result;
+          const supplyFiles = files.filter(file => file.fileType === 'supplyChain');
+          
+          if (supplyFiles.length > 0) {
+            const latestFile = supplyFiles.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))[0];
+            
+            // Get column indices
+            const importCountryIndex = latestFile.headers.indexOf('Import_country');
+            const productSubCategoryIndex = latestFile.headers.indexOf('Product_Sub_Category');
+            
+            if (importCountryIndex !== -1 && productSubCategoryIndex !== -1) {
+              // Filter rows based on selection
+              const filteredRows = latestFile.rows.filter(row => 
+                row[importCountryIndex] === selectedCountry && 
+                row[productSubCategoryIndex] === selectedProduct
+              );
+              
+              setModalData({
+                headers: latestFile.headers,
+                rows: filteredRows,
+                title: 'Updated Supply Chain Data for ' + selectedProduct + ' in ' + selectedCountry
+              });
+              setIsTableModalOpen(true);
+            } else {
+              alert('Could not find required columns in the supply chain data.');
+            }
+          } else {
+            alert('No supply chain data available. Please upload a file first.');
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error loading updated supply data:', error);
+      alert('Error loading data. Please try again.');
+    }
+  };
+
   // Fetch filtered source countries from supply chain data
   const fetchFilteredCountries = async (ingredientName) => {
     try {
@@ -107,7 +306,7 @@ const IngredientList = ({
   // Handle country selection with tariff update
   const handleSourceCountrySelection = (ingredientId, index, country) => {
     // First update the country in the source
-    handleCountrySourceChange(ingredientId, index, country);
+    localHandleSourceCountryChange(ingredientId, index, country);
     
     // Then update the tariff rate if we have it from month 5 contracts
     if (country && countryTariffRates[ingredientId] && countryTariffRates[ingredientId][country] !== undefined) {
@@ -245,7 +444,7 @@ const IngredientList = ({
                                 min="0"
                                 max="100"
                                 value={source.supplierAbsorption || 0}
-                                onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'supplierAbsorption', parseInt(e.target.value))}
+                                onChange={(e) => localHandleSliderChange(ingredient.name, index, 'supplierAbsorption', parseInt(e.target.value))}
                               />
                               <span>{source.supplierAbsorption || 0}%</span>
                             </div>
@@ -257,7 +456,7 @@ const IngredientList = ({
                                 min="0"
                                 max="100"
                                 value={source.manufacturerAbsorption || 0}
-                                onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'manufacturerAbsorption', parseInt(e.target.value))}
+                                onChange={(e) => localHandleSliderChange(ingredient.name, index, 'manufacturerAbsorption', parseInt(e.target.value))}
                               />
                               <span>{source.manufacturerAbsorption || 0}%</span>
                             </div>  
@@ -269,7 +468,7 @@ const IngredientList = ({
                                 min="0"
                                 max="90"
                                 value={source.cashPaymentDelay || 0}
-                                onChange={(e) => handleSourceSliderChange(ingredient.name, index, 'cashPaymentDelay', parseInt(e.target.value))}
+                                onChange={(e) => localHandleSliderChange(ingredient.name, index, 'cashPaymentDelay', parseInt(e.target.value))}
                               />
                               <span>{source.cashPaymentDelay || 0} days</span>
                             </div>
@@ -283,7 +482,7 @@ const IngredientList = ({
                                 id={`volume-${ingredient.name}-${index}`}
                                 type="number"
                                 value={source.percentage}
-                                onChange={(e) => handlePercentageChange(ingredient.name, index, e.target.value)}
+                                onChange={(e) => localHandleSourcePercentageChange(ingredient.name, index, e.target.value)}
                                 min="0"
                                 max="100"
                                 placeholder="Volume"
@@ -294,11 +493,11 @@ const IngredientList = ({
                             )}
                           </div>
 
-                          {/* Weight Display - FIXED THE SPAN TAG */}
+                          {/* Weight Display */}
                           <span className="source-weight">
                             Weight: {calculateSourceWeight(ingredient.percentage, source.percentage)}kg
                           </span>
-
+ 
                           {/* Tariff Display */}
                           <span className="source-tariff">
                             Tariff: {getSourceTariffRate(source, ingredient.name, selectedCountry)}%
@@ -316,7 +515,7 @@ const IngredientList = ({
                           <button
                             onClick={(e) => {
                               e.stopPropagation(); // Prevent toggling the ingredient
-                              handleRemoveCountrySource(ingredient.name, index);
+                              removeCountrySource(ingredient.name, index);
                             }}
                             className="remove-source-btn"
                             disabled={ingredientSources[ingredient.name]?.length <= 1 || !editing}
@@ -339,7 +538,7 @@ const IngredientList = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAddCountrySource(ingredient.name);
+                        addCountrySource(ingredient.name);
                       }}
                       className="add-country-btn"
                     >
