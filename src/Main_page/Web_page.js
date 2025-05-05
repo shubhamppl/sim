@@ -2,16 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Web_page.css';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import { 
-  addCountrySource, 
-  removeCountrySource, 
-  handleSourceCountryChange, 
-  handleSourcePercentageChange, 
-  handleSliderChange,
-  initializeIngredientSources,
-  calculateSourceWeight as computeSourceWeight,
-  loadUpdatedSupplyTable
-} from './SourceManagement';
 import CountryComparison from './Country_Comparison';
 import IngredientGraph from './IngredientGraph';
 import IngredientList from './IngredientList'; // Import the new component

@@ -4,8 +4,8 @@ import TariffChart from './TariffChart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Dashboard.css';
 import TariffSidebar from './TariffSidebar';
-// Import loadUpdatedSupplyTable from SourceManagement
-import { loadUpdatedSupplyTable } from '../Main_page/SourceManagement';
+// Import IngredientList from Main_page
+import IngredientList from '../Main_page/IngredientList';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -329,7 +329,7 @@ const Dashboard = () => {
 
   const handleShowUpdatedTable = () => {
     // Use the imported function with the necessary parameters
-    loadUpdatedSupplyTable(
+    IngredientList(
       country,
       product,
       "TariffDB",
